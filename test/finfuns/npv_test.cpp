@@ -5,7 +5,7 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <finfuns/finfuns.hpp>
+#include <finfuns/npv.hpp>
 
 #include <expected>
 #include <limits>
@@ -14,6 +14,9 @@
 #include <doctest/doctest.h>
 
 using namespace finfuns;
+
+namespace
+{
 
 struct TestData
 {
@@ -39,6 +42,8 @@ const std::vector<TestData> npv_cases
        {301, IndexMode::OneBased, 0.08, {8000., 9200., 10000., 12000., 14500.}, 41922.06155493236},
        {401, IndexMode::ZeroBased, -1.8, {8000., 9200., 10000., 12000., 14500.}, std::numeric_limits<double>::infinity()},
        {402, IndexMode::OneBased, -1.0, {8000., 9200., 10000., 12000., 14500.}, std::numeric_limits<double>::infinity()}};
+
+}
 
 TEST_CASE("npv")
 {
