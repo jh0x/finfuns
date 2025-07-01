@@ -7,11 +7,17 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <chrono>
 #include <cstdint>
 #include <string_view>
 
 namespace finfuns
 {
+
+template <typename D>
+concept ChronoDayType = requires(const D & d) {
+    { d.time_since_epoch() } -> std::convertible_to<std::chrono::days>;
+};
 
 enum class DayCountConvention : int32_t
 {
@@ -32,13 +38,15 @@ inline constexpr std::string_view day_count_to_string(DayCountConvention dcc)
     }
 }
 
-inline constexpr int days_between_act(int d1, int d2)
+
+template <ChronoDayType D>
+inline constexpr int days_between_act(D d1, D d2)
 {
-    return d2 - d1;
+    return (d2 - d1).count();
 }
 
 template <DayCountConvention dcc, typename D>
-inline constexpr double year_fraction(int d1, int d2)
+inline constexpr double year_fraction(D d1, D d2)
 {
     if constexpr (dcc == DayCountConvention::ACT_365F)
         return days_between_act(d1, d2) / 365.0;

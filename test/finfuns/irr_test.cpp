@@ -57,7 +57,7 @@ TEST_CASE("irr")
         }
         else
         {
-            REQUIRE(!result.has_value());
+            REQUIRE(not result.has_value());
             CHECK(result.error() == test.expected_result.error());
         }
     }

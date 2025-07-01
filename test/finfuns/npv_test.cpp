@@ -63,7 +63,7 @@ TEST_CASE("npv")
         }
         else
         {
-            REQUIRE(!result.has_value());
+            REQUIRE(not result.has_value());
             CHECK(result.error() == test.expected_result.error());
         }
     }

@@ -9,3 +9,4 @@
 
 #include <finfuns/irr.hpp>
 #include <finfuns/npv.hpp>
+#include <finfuns/xnpv.hpp>
