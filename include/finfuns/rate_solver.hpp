@@ -12,6 +12,7 @@
 #include <cmath>
 #include <expected>
 #include <limits>
+#include <string_view>
 #include <utility>
 
 namespace finfuns
@@ -22,11 +23,27 @@ enum class SolverErrorCode
     CANNOT_EVALUATE_VALUE,
     CANNOT_CONVERGE_DUE_TO_ROUNDING_ERRORS,
     CANNOT_CONVERGE_DUE_TO_INVALID_ARGUMENTS,
-    CANNOT_CONVERGE_TOO_MANY_ITERATIONS,
-    INPUT_DATES_NOT_SORTED_UNIQUE,
     NO_ROOT_FOUND_IN_BRACKET,
     OTHER_ERROR
 };
+
+inline constexpr std::string_view error_to_sv(SolverErrorCode error)
+{
+    switch (error)
+    {
+        case SolverErrorCode::CANNOT_EVALUATE_VALUE:
+            return "Cannot evaluate value";
+        case SolverErrorCode::CANNOT_CONVERGE_DUE_TO_ROUNDING_ERRORS:
+            return "Cannot converge due to rounding errors";
+        case SolverErrorCode::CANNOT_CONVERGE_DUE_TO_INVALID_ARGUMENTS:
+            return "Cannot converge due to invalid arguments";
+        case SolverErrorCode::NO_ROOT_FOUND_IN_BRACKET:
+            return "No root found in the specified bracket";
+        case SolverErrorCode::OTHER_ERROR:
+            return "Other error occurred";
+    }
+    return "Unknown error code";
+}
 
 template <typename Function, typename Derivative>
 std::expected<double, SolverErrorCode> rate_solver(Function && fun, Derivative && der, double guess)

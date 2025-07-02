@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstdint>
 #include <expected>
+#include <string_view>
 
 namespace finfuns
 {
@@ -21,6 +22,19 @@ enum class NPVError : int32_t
     InvalidRate, //!< rate is NaN/infinity
     EmptyCashflows, //!< cashflows.empty()
 };
+
+inline constexpr std::string_view error_to_sv(NPVError error)
+{
+    switch (error)
+    {
+        case NPVError::InvalidRate:
+            return "Invalid rate: NaN or infinity";
+        case NPVError::EmptyCashflows:
+            return "Cashflows array is empty";
+        default:
+            return "Unknown NPV error";
+    }
+}
 
 template <IndexMode index_mode>
 std::expected<double, NPVError> npv(double rate, std::span<const double> cashflows)

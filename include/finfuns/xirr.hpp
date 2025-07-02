@@ -7,8 +7,8 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include <finfuns/npv_calculator.hpp>
 #include <finfuns/rate_solver.hpp>
+#include <finfuns/xnpv_calculator.hpp>
 
 #include <expected>
 #include <optional>
@@ -18,36 +18,43 @@
 namespace finfuns
 {
 
-enum class IRRErrorCode : int32_t
+enum class XIRRErrorCode : int32_t
 {
     NotEnoughCashflows, //!< At least two cashflows are required
     SameSignCashflows, //!< All cashflows have the same sign (all positive or all negative)
+    CashflowsDatesSizeMismatch, //!< cashflows size does not match dates size
 };
 
-using IRRError = std::variant<IRRErrorCode, SolverErrorCode>;
+using XIRRError = std::variant<XIRRErrorCode, SolverErrorCode>;
 
-inline constexpr std::string_view error_to_sv(IRRErrorCode error)
+inline constexpr std::string_view error_to_sv(XIRRErrorCode error)
 {
     switch (error)
     {
-        case IRRErrorCode::NotEnoughCashflows:
+        case XIRRErrorCode::NotEnoughCashflows:
             return "Not enough cashflows: at least two are required";
-        case IRRErrorCode::SameSignCashflows:
+        case XIRRErrorCode::SameSignCashflows:
             return "All cashflows have the same sign (all positive or all negative)";
+        case XIRRErrorCode::CashflowsDatesSizeMismatch:
+            return "Cashflows and dates arrays must have the same size";
         default:
-            return "Unknown IRR error";
+            return "Unknown XIRR error";
     }
 }
 
-inline constexpr std::string_view error_to_sv(const IRRError & error)
+inline constexpr std::string_view error_to_sv(const XIRRError & error)
 {
     return std::visit([](const auto & e) { return error_to_sv(e); }, error);
 }
 
-std::expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
+template <DayCountConvention day_count, typename DateType>
+std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::span<const DateType> dates, std::optional<double> guess)
 {
     if (cashflows.size() <= 1) [[unlikely]]
-        return std::unexpected(IRRErrorCode::NotEnoughCashflows);
+        return std::unexpected(XIRRErrorCode::NotEnoughCashflows);
+
+    if (cashflows.size() != dates.size()) [[unlikely]]
+        return std::unexpected(XIRRErrorCode::CashflowsDatesSizeMismatch);
 
     bool has_positive = false;
     bool has_negative = false;
@@ -62,14 +69,14 @@ std::expected<double, IRRError> irr(std::span<const double> cashflows, std::opti
             break;
     }
     if (not(has_negative && has_positive)) [[unlikely]]
-        return std::unexpected(IRRErrorCode::SameSignCashflows);
+        return std::unexpected(XIRRErrorCode::SameSignCashflows);
 
     const double guess_value = guess.value_or(0.1);
-    auto npv = NpvCalculator(cashflows);
-    auto npv_function = [&](double rate) { return npv.calculate(rate); };
-    auto npv_derivative = [&](double rate) { return npv.derivative(rate); };
+    auto xnpv = XnpvCalculator<DateType, day_count>(cashflows, dates);
+    auto xnpv_function = [&](double rate) { return xnpv.calculate(rate); };
+    auto xnpv_derivative = [&](double rate) { return xnpv.derivative(rate); };
 
-    auto res = rate_solver(npv_function, npv_derivative, guess_value);
+    auto res = rate_solver(xnpv_function, xnpv_derivative, guess_value);
     if (res.has_value()) [[likely]]
         return res.value();
     return std::unexpected(res.error());

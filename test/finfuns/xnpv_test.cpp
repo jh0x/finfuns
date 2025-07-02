@@ -5,6 +5,8 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include "day_count_helper.hpp"
+
 #include <finfuns/xnpv.hpp>
 
 #include <chrono>
@@ -71,7 +73,13 @@ const std::vector<TestData> xnpv_cases
         0.1,
         {-10000.0, 5750.0, 4250.0, 3250.0},
         {2020y / 1 / 1, 2020y / 3 / 1, 2020y / 10 / 30, 2021y / 2 / 15},
-        {{DayCountConvention::ACT_365F, 2506.579458169746}, {DayCountConvention::ACT_365_25, 2507.067268742502}}}};
+        {{DayCountConvention::ACT_365F, 2506.579458169746}, {DayCountConvention::ACT_365_25, 2507.067268742502}}},
+       {5,
+        -1.,
+        {-10000.0, 5750.0, 4250.0, 3250.0},
+        {2020y / 1 / 1, 2020y / 3 / 1, 2020y / 10 / 30, 2021y / 2 / 15},
+        {{DayCountConvention::ACT_365F, std::numeric_limits<double>::infinity()},
+         {DayCountConvention::ACT_365_25, std::numeric_limits<double>::infinity()}}}};
 
 }
 
@@ -89,15 +97,6 @@ TEST_CASE("xnpv_error_cases")
     }
 }
 
-static constexpr auto convert_days_to_ints(std::span<const std::chrono::sys_days> dates)
-{
-    std::vector<int> result;
-    result.reserve(dates.size());
-    for (const auto & date : dates)
-        result.push_back(static_cast<int>(date.time_since_epoch().count()));
-    return result;
-}
-
 template <typename DateType>
 static constexpr auto invoke_xnpv(DayCountConvention dcc, double rate, std::span<const double> cashflows, std::span<const DateType> dates)
 {
@@ -111,26 +110,6 @@ static constexpr auto invoke_xnpv(DayCountConvention dcc, double rate, std::span
             throw std::invalid_argument("Unsupported DayCountConvention");
     }
 }
-
-
-struct SysDates
-{
-    static constexpr std::vector<std::chrono::sys_days> process(std::span<const std::chrono::sys_days> dates)
-    {
-        return std::vector<std::chrono::sys_days>(dates.begin(), dates.end());
-    }
-};
-struct IntDates
-{
-    static constexpr std::vector<int> process(std::span<const std::chrono::sys_days> dates)
-    {
-        std::vector<int> result;
-        result.reserve(dates.size());
-        for (const auto & date : dates)
-            result.push_back(static_cast<int>(date.time_since_epoch().count()));
-        return result;
-    }
-};
 
 DOCTEST_TEST_CASE_TEMPLATE("XNPV", T, SysDates, IntDates)
 {

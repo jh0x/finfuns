@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdint>
 #include <expected>
+#include <string_view>
 
 namespace finfuns
 {
@@ -23,6 +24,21 @@ enum class XNPVError : int32_t
     EmptyCashflows, //!< cashflows.empty()
     CashflowsDatesSizeMismatch, //!< cashflows size does not match dates size
 };
+
+inline constexpr std::string_view error_to_sv(XNPVError error)
+{
+    switch (error)
+    {
+        case XNPVError::InvalidRate:
+            return "Invalid rate: NaN or infinity";
+        case XNPVError::EmptyCashflows:
+            return "Cashflows array is empty";
+        case XNPVError::CashflowsDatesSizeMismatch:
+            return "Cashflows and dates arrays must have the same size";
+        default:
+            return "Unknown XNPV error";
+    }
+}
 
 template <DayCountConvention day_count, typename DateType>
 std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, std::span<const DateType> dates)
