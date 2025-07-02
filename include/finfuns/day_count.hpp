@@ -45,6 +45,11 @@ inline constexpr int days_between_act(D d1, D d2)
     return (d2 - d1).count();
 }
 
+inline constexpr int days_between_act(int d1, int d2)
+{
+    return d2 - d1;
+}
+
 template <DayCountConvention dcc, typename D>
 inline constexpr double year_fraction(D d1, D d2)
 {
