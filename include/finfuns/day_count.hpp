@@ -40,7 +40,7 @@ inline constexpr std::string_view day_count_to_string(DayCountConvention dcc)
 
 
 template <ChronoDayType D>
-inline constexpr int days_between_act(D d1, D d2)
+inline constexpr auto days_between_act(D d1, D d2)
 {
     return (d2 - d1).count();
 }
@@ -54,9 +54,9 @@ template <DayCountConvention dcc, typename D>
 inline constexpr double year_fraction(D d1, D d2)
 {
     if constexpr (dcc == DayCountConvention::ACT_365F)
-        return days_between_act(d1, d2) / 365.0;
+        return static_cast<double>(days_between_act(d1, d2)) / 365.0;
     else if constexpr (dcc == DayCountConvention::ACT_365_25)
-        return days_between_act(d1, d2) / 365.25;
+        return static_cast<double>(days_between_act(d1, d2)) / 365.25;
     else
         []<bool flag = false>() { static_assert(flag, "Unsupported DayCountConvention"); }();
 }
