@@ -53,4 +53,15 @@ std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashf
     return calc.calculate(rate);
 }
 
+template <DayCountConvention day_count, typename DateContainer>
+std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, DateContainer && dates)
+{
+    using ContainedType = std::remove_cvref_t<decltype(*std::begin(dates))>;
+
+    return xnpv<day_count>(
+        rate,
+        cashflows,
+        std::span<const ContainedType>{dates.data(), static_cast<std::size_t>(std::distance(std::begin(dates), std::end(dates)))});
+}
+
 }

@@ -82,4 +82,15 @@ std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::sp
     return std::unexpected(res.error());
 }
 
+template <DayCountConvention day_count, typename DateContainer>
+std::expected<double, XIRRError> xirr(std::span<const double> cashflows, DateContainer && dates, std::optional<double> guess)
+{
+    using ContainedType = std::remove_cvref_t<decltype(*std::begin(dates))>;
+
+    return xirr<day_count>(
+        cashflows,
+        std::span<const ContainedType>{dates.data(), static_cast<std::size_t>(std::distance(std::begin(dates), std::end(dates)))},
+        guess);
+}
+
 }

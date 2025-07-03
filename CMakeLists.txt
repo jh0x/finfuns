@@ -41,6 +41,12 @@ if(NOT CMAKE_SKIP_INSTALL_RULES)
     include(cmake/install-rules.cmake)
 endif()
 
+option(finfuns_BUILD_EXAMPLES "Build examples" OFF)
+
+if(PROJECT_IS_TOP_LEVEL AND finfuns_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
 # ---- Developer mode ----
 if(NOT finfuns_DEVELOPER_MODE)
     return()
