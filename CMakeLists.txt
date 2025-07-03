@@ -1,38 +1,54 @@
 cmake_minimum_required(VERSION 3.20)
+
+include(cmake/prelude.cmake)
+
 project(finfuns VERSION 0.1.0 LANGUAGES CXX)
+
+include(cmake/project-is-top-level.cmake)
+include(cmake/variables.cmake)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# ---- Dependencies ----
+
+find_package(Boost 1.33.0 REQUIRED)
+message(STATUS "Boost found: ${Boost_VERSION}")
+message(STATUS "Boost includes: ${Boost_INCLUDE_DIRS}")
+
+# ---- Declare library ----
+
 add_library(finfuns INTERFACE)
 add_library(finfuns::finfuns ALIAS finfuns)
 
+set_property(TARGET finfuns PROPERTY EXPORT_NAME finfuns)
+
 target_compile_features(finfuns INTERFACE cxx_std_23)
 
-target_include_directories(finfuns INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+target_include_directories(
+    finfuns
+    ${warning_guard}
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
-option(FINFUNS_BUILD_TESTS "Build tests for finfuns" OFF)
+# ---- Install rules ----
 
-if(FINFUNS_BUILD_TESTS)
-    enable_testing()
-
-    add_library(doctest INTERFACE)
-    target_include_directories(doctest INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/extern/doctest)
-    add_library(doctest::doctest ALIAS doctest)
-    
-    add_subdirectory(test)
+if(NOT CMAKE_SKIP_INSTALL_RULES)
+    include(cmake/install-rules.cmake)
 endif()
 
-include(GNUInstallDirs)
-install(DIRECTORY include/finfuns DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(TARGETS finfuns EXPORT finfuns-targets)
-install(EXPORT finfuns-targets
-    FILE finfuns-config.cmake
-    NAMESPACE finfuns::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/finfuns
-)
+# ---- Developer mode ----
+if(NOT finfuns_DEVELOPER_MODE)
+    return()
+elseif(NOT PROJECT_IS_TOP_LEVEL)
+    message(
+        AUTHOR_WARNING
+        "Developer mode is intended for developers of finfuns"
+    )
+endif()
+
+include(cmake/dev-mode.cmake)
