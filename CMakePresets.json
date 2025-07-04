@@ -26,14 +26,8 @@
       "hidden": true,
       "inherits": "cmake-pedantic",
       "cacheVariables": {
-        "headeronly_DEVELOPER_MODE": "ON"
-      }
-    },
-    {
-      "name": "cppcheck",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr"
+        "finfuns_DEVELOPER_MODE": "ON",
+        "finfuns_BUILD_EXAMPLES": "ON"
       }
     },
     {
@@ -151,11 +145,23 @@
     },
     {
       "name": "ci-ubuntu",
-      "inherits": ["ci-build", "ci-linux", "clang-tidy", "cppcheck", "dev-mode"]
+      "inherits": ["ci-build", "ci-linux", "clang-tidy", "dev-mode"]
     },
     {
       "name": "ci-windows",
       "inherits": ["ci-build", "ci-win64", "dev-mode", "ci-multi-config"]
+    },
+    {
+      "name": "dev-linux",
+      "description": "Local development with warnings and dev mode",
+      "inherits": ["ci-build", "ci-linux", "clang-tidy", "flags-gcc-clang", "dev-mode"],
+      "generator": "Ninja"
+    },
+    {
+      "name": "dev-windows",
+      "description": "Local development with warnings and dev mode",
+      "inherits": ["ci-build", "ci-win64", "clang-tidy", "flags-msvc", "dev-mode"],
+      "generator": "Ninja"
     }
   ]
 }
