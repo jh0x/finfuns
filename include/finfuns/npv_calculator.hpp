@@ -10,6 +10,7 @@
 #include <cmath>
 #include <cstdint>
 #include <expected>
+#include <limits>
 #include <numeric>
 #include <span>
 

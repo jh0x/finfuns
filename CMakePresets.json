@@ -160,8 +160,7 @@
     {
       "name": "dev-windows",
       "description": "Local development with warnings and dev mode",
-      "inherits": ["ci-build", "ci-win64", "clang-tidy", "flags-msvc", "dev-mode"],
-      "generator": "Ninja"
+      "inherits": ["ci-build", "ci-win64", "clang-tidy", "flags-msvc", "dev-mode"]
     }
   ]
 }

@@ -14,7 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ---- Dependencies ----
 
-find_package(Boost 1.33.0 REQUIRED)
+find_package(Boost 1.68.0 REQUIRED COMPONENTS headers)
 message(STATUS "Boost found: ${Boost_VERSION}")
 message(STATUS "Boost includes: ${Boost_INCLUDE_DIRS}")
 
@@ -33,7 +33,9 @@ target_include_directories(
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
 )
+target_link_libraries(finfuns INTERFACE Boost::headers)
 
 # ---- Install rules ----
 
