@@ -34,6 +34,8 @@ struct XnpvCalculator
             return std::numeric_limits<double>::infinity();
 
         double npv = 0.0;
+        const double one_plus_rate = 1.0 + rate;
+        const double log1pr = std::log(one_plus_rate);
 
         for (size_t i = 0; i < _cashflows.size(); ++i)
         {
@@ -41,7 +43,7 @@ struct XnpvCalculator
             if (time == 0.0)
                 npv += _cashflows[i];
             else
-                npv += _cashflows[i] / std::pow(1.0 + rate, time);
+                npv += _cashflows[i] / std::exp(time * log1pr);
         }
 
         return npv;
@@ -53,12 +55,14 @@ struct XnpvCalculator
             return std::numeric_limits<double>::infinity();
 
         double derivative = 0.0;
+        const double one_plus_rate = 1.0 + rate;
+        const double log1pr = std::log(one_plus_rate);
 
         for (size_t i = 0; i < _cashflows.size(); ++i)
         {
             double time = year_fraction<day_count>(_dates[0], _dates[i]);
             if (time != 0.0)
-                derivative -= _cashflows[i] * time / std::pow(1.0 + rate, time + 1);
+                derivative -= _cashflows[i] * time / (one_plus_rate * std::exp(time * log1pr));
         }
 
         return derivative;
