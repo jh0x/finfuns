@@ -49,11 +49,12 @@ struct XnpvCalculator
         return npv;
     }
 
-    double derivative(double rate) const
+    std::pair<double, double> calculate_with_derivative(double rate) const
     {
         if (rate <= -1.0)
-            return std::numeric_limits<double>::infinity();
+            return {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity()};
 
+        double npv = 0.0;
         double derivative = 0.0;
         const double one_plus_rate = 1.0 + rate;
         const double log1pr = std::log(one_plus_rate);
@@ -61,11 +62,19 @@ struct XnpvCalculator
         for (size_t i = 0; i < _cashflows.size(); ++i)
         {
             double time = year_fraction<day_count>(_dates[0], _dates[i]);
-            if (time != 0.0)
-                derivative -= _cashflows[i] * time / (one_plus_rate * std::exp(time * log1pr));
+            if (time == 0.0)
+            {
+                npv += _cashflows[i];
+            }
+            else
+            {
+                const double discount_factor = std::exp(time * log1pr);
+                npv += _cashflows[i] / discount_factor;
+                derivative -= _cashflows[i] * time / (one_plus_rate * discount_factor);
+            }
         }
 
-        return derivative;
+        return {npv, derivative};
     }
 };
 

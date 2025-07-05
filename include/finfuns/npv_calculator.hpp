@@ -70,20 +70,34 @@ struct NpvCalculator
     }
 
     // Used only for IRR calculation, hence just ZeroBased
-    double derivative(double rate) const
+    std::pair<double, double> calculate_with_derivative(double rate) const
     {
-        if (rate <= -1.0)
-            return std::numeric_limits<double>::quiet_NaN();
+        if (rate == 0)
+        {
+            double sum = std::accumulate(std::begin(_cashflows), std::end(_cashflows), 0.0);
+            double derivative = 0.0;
+            for (size_t i = 1; i < _cashflows.size(); ++i)
+            {
+                derivative -= _cashflows[i] * static_cast<double>(i);
+            }
+            return {sum, derivative};
+        }
 
+        if (rate <= -1.0) [[unlikely]]
+            return {std::numeric_limits<double>::infinity(), std::numeric_limits<double>::quiet_NaN()};
+
+        double npv = _cashflows[0]; // First cashflow (t=0) is not discounted
         double derivative = 0.0;
-        double compound = (1.0 + rate);
+        double compound = (1.0 + rate); // (1+r)^1 for t=1
 
         for (size_t i = 1; i < _cashflows.size(); ++i)
         {
-            compound *= (1.0 + rate);
-            derivative -= _cashflows[i] * static_cast<double>(i) / compound;
+            npv += _cashflows[i] / compound;
+            derivative -= _cashflows[i] * static_cast<double>(i) / (compound * (1.0 + rate));
+            compound *= (1.0 + rate); // becomes (1+r)^(i+1) for next iteration
         }
-        return derivative;
+
+        return {npv, derivative};
     }
 };
 

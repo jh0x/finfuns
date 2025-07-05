@@ -45,8 +45,8 @@ inline constexpr std::string_view error_to_sv(SolverErrorCode error)
     return "Unknown error code";
 }
 
-template <typename Function, typename Derivative>
-std::expected<double, SolverErrorCode> rate_solver(Function && fun, Derivative && der, double guess)
+template <typename Calculator>
+std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, double guess)
 {
     constexpr int max_iterations = 100;
     constexpr double start_lower_bound = -0.999999; // Avoid the rate of -1.
@@ -59,14 +59,24 @@ std::expected<double, SolverErrorCode> rate_solver(Function && fun, Derivative &
         // 53 - 4 bits of precision => ~14.75 decimal digits - accurate enough for our purpose
         constexpr auto binary_precision = std::numeric_limits<double>::digits - 4;
 
+        std::pair<double, double> f0_f1;
+        auto f0 = [&calculator, &f0_f1](double rate)
+        {
+            f0_f1 = calculator.calculate_with_derivative(rate);
+            return f0_f1.first;
+        };
+        auto f1 = [&calculator, &f0_f1](double rate) { return f0_f1.second; };
+        // newton_raphson_iterate evaluates f0 and f1 in order (but sadly the API doesn't allow us to pass something like FunWithDerivative directly)
+
         double result = boost::math::tools::newton_raphson_iterate(
-            [&fun, &der](double x) { return std::make_tuple(fun(x), der(x)); },
+            [&f0, &f1](double x) { return std::make_tuple(f0(x), f1(x)); },
             guess,
             start_lower_bound,
             start_upper_bound,
             binary_precision,
             max_iter);
 
+        auto fun = [&calculator](double rate) { return calculator.calculate(rate); };
         if (result >= start_lower_bound && result <= start_upper_bound && std::abs(fun(result)) < tolerance)
             return result;
 

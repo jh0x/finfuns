@@ -66,10 +66,8 @@ std::expected<double, IRRError> irr(std::span<const double> cashflows, std::opti
 
     const double guess_value = guess.value_or(0.1);
     auto npv = NpvCalculator(cashflows);
-    auto npv_function = [&](double rate) { return npv.calculate(rate); };
-    auto npv_derivative = [&](double rate) { return npv.derivative(rate); };
 
-    auto res = rate_solver(npv_function, npv_derivative, guess_value);
+    auto res = rate_solver(std::move(npv), guess_value);
     if (res.has_value()) [[likely]]
         return res.value();
     return std::unexpected(res.error());

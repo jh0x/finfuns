@@ -73,10 +73,8 @@ std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::sp
 
     const double guess_value = guess.value_or(0.1);
     auto xnpv = XnpvCalculator<DateType, day_count>(cashflows, dates);
-    auto xnpv_function = [&](double rate) { return xnpv.calculate(rate); };
-    auto xnpv_derivative = [&](double rate) { return xnpv.derivative(rate); };
 
-    auto res = rate_solver(xnpv_function, xnpv_derivative, guess_value);
+    auto res = rate_solver(std::move(xnpv), guess_value);
     if (res.has_value()) [[likely]]
         return res.value();
     return std::unexpected(res.error());
