@@ -7,6 +7,7 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <finfuns/fv.hpp>
 #include <finfuns/irr.hpp>
 #include <finfuns/npv.hpp>
 #include <finfuns/pv.hpp>
