@@ -107,6 +107,42 @@ $$
 \sum_{i=0}^n \frac{cashflow_i}{(1 + rate)^{(date_i - date_0)/365}} = 0
 $$
 
+### `pv` (Present Value of an Annuity)
+
+```cpp
+template <PaymentDueType due_type>
+double pv(double rate, uint32_t periods, double pmt, double future_value = 0.0)
+```
+
+Calculates the present value (PV) of an annuity - a series of equal payments (optionally including a future value inflow), and accounting for payment timing (end or beginning of period).
+
+Example:
+You are taking a loan where you will pay $500/month for 3 years (36 months), with an interest rate of 6% annually (0.5% per month):
+
+- `rate` - `0.005` (we have monthly intervals)
+- `periods` - `36`
+- `pmt` - `-500` (you pay back the loan)
+
+#### Equations
+
+- End of Period (`PaymentDueType::EndOfPeriod`):
+
+$$
+PV = -PMT \times \frac{1 - (1 + r)^{-n}}{r} - FV \times (1 + r)^{-n}
+$$
+
+- Beginning of Period (`PaymentDueType::BeginningOfPeriod`):
+
+$$
+PV = -PMT \times \frac{1 - (1 + r)^{-n}}{r} \times (1 + r) - FV \times (1 + r)^{-n}
+$$
+
+- Zero Rate Special Case:
+
+$$
+PV = -PMT \times n - FV
+$$
+
 ### Supported `DayCountConventions`
 
 ```cpp

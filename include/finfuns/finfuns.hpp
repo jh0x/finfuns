@@ -9,5 +9,6 @@
 
 #include <finfuns/irr.hpp>
 #include <finfuns/npv.hpp>
+#include <finfuns/pv.hpp>
 #include <finfuns/xirr.hpp>
 #include <finfuns/xnpv.hpp>

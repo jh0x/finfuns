@@ -3,6 +3,7 @@ add_executable(
     main.cpp
     irr_test.cpp
     npv_test.cpp
+    pv_test.cpp
     xirr_test.cpp
     xnpv_test.cpp
 )
