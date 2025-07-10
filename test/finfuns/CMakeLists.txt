@@ -1,6 +1,7 @@
 add_executable(
     finfuns_tests
     main.cpp
+    fv_test.cpp
     irr_test.cpp
     npv_test.cpp
     pv_test.cpp

@@ -116,11 +116,12 @@ double pv(double rate, uint32_t periods, double pmt, double future_value = 0.0)
 
 Calculates the present value (PV) of an annuity - a series of equal payments (optionally including a future value inflow), and accounting for payment timing (end or beginning of period).
 
-Example:
+#### Example
+
 You are taking a loan where you will pay $500/month for 3 years (36 months), with an interest rate of 6% annually (0.5% per month):
 
 - `rate` - `0.005` (we have monthly intervals)
-- `periods` - `36`
+- `periods` - `36` (3 years x 12 months)
 - `pmt` - `-500` (you pay back the loan)
 
 #### Equations
@@ -141,6 +142,44 @@ $$
 
 $$
 PV = -PMT \times n - FV
+$$
+
+### `fv` (Future Value of an Annuity)
+
+```cpp
+template <PaymentDueType due_type>
+double fv(double rate, uint32_t periods, double pmt, double present_value = 0.0)
+```
+
+Calculates the future value (FV) of an annuity - a series of equal payments (optionally including a present value), and accounting for whether payments are made at the beginning or end of each period.
+
+#### Example
+
+You invest $100 per month for 10 years in an account earning 6% annually (0.5% monthly):
+
+- `rate` - `0.005` (monthly interest rate)
+- `periods` - `120` (10 years x 12 months)
+- `pmt` - `-100` (you pay into the account each month)
+- `present_value` - `0.0` (no initial deposit)
+
+#### Equations
+
+- End of Period (PaymentDueType::EndOfPeriod):
+
+$$
+FV = -PMT \times \frac{(1+r)^{n}-1}{r} - PV \times (1+r)^{n}
+$$
+
+- Beginning of Period (PaymentDueType::BeginningOfPeriod):
+
+$$
+FV = -PMT \times \frac{(1+r)^{n}-1}{r} \times (1+r)-PV \times (1+r)^{n}
+$$
+
+- Zero Rate Special Case (r = 0):
+
+$$
+FV=-PMT \times n - PV
 $$
 
 ### Supported `DayCountConventions`
