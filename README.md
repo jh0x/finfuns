@@ -4,13 +4,13 @@ A collection of financial functions that I wrote while adding support for
 them to
 [ClickHouse (PR #81599)](https://github.com/ClickHouse/ClickHouse/pull/81599).
 
-Header only library is provided in `include/finfuns` (`finfuns::finfuns` in `CMakeLists`)
+Header only library is provided in `include/finfuns` (`finfuns::headers` in `CMakeLists`)
 
 Examples are provided in `examples`.
 
 ## Quick Start
 
-- Use `finfuns::finfuns` CMake target in your project...
+- Use `finfuns::headers` CMake target in your project...
 - or directly include the headers from `include/finfuns`
 
 Example usage:

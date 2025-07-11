@@ -18,10 +18,10 @@ find_package(Boost 1.68.0 REQUIRED COMPONENTS headers)
 message(STATUS "Boost found: ${Boost_VERSION}")
 message(STATUS "Boost includes: ${Boost_INCLUDE_DIRS}")
 
-# ---- Declare library ----
+# ---- Declare header-only library ----
 
 add_library(finfuns INTERFACE)
-add_library(finfuns::finfuns ALIAS finfuns)
+add_library(finfuns::headers ALIAS finfuns)
 
 set_property(TARGET finfuns PROPERTY EXPORT_NAME finfuns)
 
@@ -36,6 +36,46 @@ target_include_directories(
         $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
 )
 target_link_libraries(finfuns INTERFACE Boost::headers)
+
+# ---- Declare library ----
+add_library(finfunslib finfunslib/finfunslib.cpp)
+add_library(finfuns::lib ALIAS finfunslib)
+
+include(GenerateExportHeader)
+generate_export_header(
+    finfunslib
+    BASE_NAME finfunslib
+    EXPORT_FILE_NAME export/shared/finfunslib_export.h
+    CUSTOM_CONTENT_FROM_VARIABLE pragma_suppress_c4251
+)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(finfunslib PUBLIC SHARED_STATIC_DEFINE)
+endif()
+if(WIN32 AND BUILD_SHARED_LIBS)
+    target_compile_definitions(finfunslib PRIVATE "FINFUNSLIB_BUILD_DLL")
+endif()
+
+set_target_properties(
+    finfunslib
+    PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+        VERSION "${PROJECT_VERSION}"
+        SOVERSION "${PROJECT_VERSION_MAJOR}"
+        EXPORT_NAME finfunslib
+        OUTPUT_NAME finfunslib
+)
+
+target_include_directories(
+    finfunslib
+    SYSTEM
+    PUBLIC "\$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>"
+)
+
+target_link_libraries(finfunslib PRIVATE finfuns::headers)
+
+target_compile_features(finfunslib PUBLIC cxx_std_23)
 
 # ---- Install rules ----
 

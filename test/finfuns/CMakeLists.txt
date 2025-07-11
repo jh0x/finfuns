@@ -9,6 +9,6 @@ add_executable(
     xnpv_test.cpp
 )
 
-target_link_libraries(finfuns_tests PRIVATE finfuns::finfuns doctest::doctest)
+target_link_libraries(finfuns_tests PRIVATE finfuns::headers doctest::doctest)
 
 add_test(NAME finfuns_tests COMMAND finfuns_tests)
