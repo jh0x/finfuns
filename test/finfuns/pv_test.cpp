@@ -61,8 +61,6 @@ const std::vector<TestData> pv_cases = {
     // Invalid rates
     {100, PaymentDueType::BeginningOfPeriod, -1, 60, -500.0, 10000.0, std::numeric_limits<double>::quiet_NaN()},
     {101, PaymentDueType::EndOfPeriod, -1, 60, -500.0, 10000.0, std::numeric_limits<double>::quiet_NaN()}};
-
-
 }
 
 TEST_CASE("pv")

@@ -38,7 +38,7 @@ target_include_directories(
 target_link_libraries(finfuns INTERFACE Boost::headers)
 
 # ---- Declare library ----
-add_library(finfunslib finfunslib/finfunslib.cpp)
+add_library(finfunslib lib/finfunslib/src/finfunslib.cpp)
 add_library(finfuns::lib ALIAS finfunslib)
 
 include(GenerateExportHeader)
@@ -69,8 +69,9 @@ set_target_properties(
 
 target_include_directories(
     finfunslib
-    SYSTEM
-    PUBLIC "\$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>"
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>
 )
 
 target_link_libraries(finfunslib PRIVATE finfuns::headers)

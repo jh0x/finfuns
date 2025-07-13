@@ -5,7 +5,7 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#include "finfunslib.h"
+#include <finfunslib/finfunslib.h>
 
 #include <finfuns/finfuns.hpp>
 #include <finfuns/overloaded.hpp>
