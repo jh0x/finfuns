@@ -71,12 +71,7 @@ FinFunsNPVCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * ca
 }
 
 FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
-    FinFunsDayCount day_count,
-    double rate,
-    const double * cashflows,
-    const int * dates,
-    int32_t num_cashflows,
-    double * out_result) noexcept
+    FinFunsDayCount day_count, double rate, const double * cashflows, const int * dates, int num_cashflows, double * out_result) noexcept
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);
@@ -102,12 +97,7 @@ FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
 }
 
 FINFUNSLIB_EXPORT FinFunsXIRRCode finfuns_xirr(
-    FinFunsDayCount day_count,
-    const double * cashflows,
-    const int * dates,
-    int32_t num_cashflows,
-    double guess,
-    double * out_result) noexcept
+    FinFunsDayCount day_count, const double * cashflows, const int * dates, int num_cashflows, double guess, double * out_result) noexcept
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);

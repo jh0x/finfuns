@@ -54,7 +54,8 @@ typedef enum
  *
  * @warning The first cashflow should typically be negative (initial investment).
  */
-FinFunsIRRCode finfuns_irr(const double * cashflows, int num_cashflows, double guess, double * out_result) noexcept;
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsIRRCode
+finfuns_irr(const double * cashflows, int num_cashflows, double guess, double * out_result) noexcept;
 
 /**
  * @brief Error codes for NPV calculations
@@ -89,7 +90,8 @@ typedef enum
  * @note For ZeroBased mode, the first cashflow is considered to occur at time t=0.
  *       For OneBased mode, all cashflows are discounted (first occurs at t=1).
  */
-FinFunsNPVCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept;
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsNPVCode
+finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept;
 
 
 /**
@@ -119,7 +121,7 @@ typedef enum
  * @param day_count Day count convention (see FinFunsDayCount)
  * @param rate Discount rate (must be >= -1.0 and finite)
  * @param cashflows Array of cash flows
- * @param dates Array of Unix timestamps (seconds since epoch)
+ * @param dates Array of dates (days since epoch)
  * @param num_dates Length of cashflows / dates array
  * @param[out] out_result Calculated XNPV (valid only if return code is SUCCESS)
  *
@@ -127,13 +129,8 @@ typedef enum
  *
  * @warning First cashflow (typically the investment) should be negative
  */
-FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
-    FinFunsDayCount day_count,
-    double rate,
-    const double * cashflows,
-    const int * dates,
-    int32_t num_cashflows,
-    double * out_result) noexcept;
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsXNPVCode finfuns_xnpv(
+    FinFunsDayCount day_count, double rate, const double * cashflows, const int * dates, int num_cashflows, double * out_result) noexcept;
 
 /**
  * @brief Error codes for XIRR calculations
@@ -160,7 +157,7 @@ typedef enum
  *
  * @param day_count Day count convention (see FinFunsXIRRDayCount)
  * @param cashflows Array of cash flows (must contain both positive/negative values)
- * @param dates Array of Unix timestamps (seconds since epoch)
+ * @param dates Array of dates (days since epoch)
  * @param num_cashflows Length of cashflows array (must be >= 2)
  * @param guess Initial guess for the rate (suggested: 0.1 for 10%)
  * @param[out] out_result Calculated XIRR (valid only if return code is SUCCESS)
@@ -170,13 +167,8 @@ typedef enum
  * @note Uses modified Newton-Raphson with fallback to bracketing when needed
  * @warning First cashflow should typically be negative (initial investment)
  */
-FINFUNSLIB_EXPORT FinFunsXIRRCode finfuns_xirr(
-    FinFunsDayCount day_count,
-    const double * cashflows,
-    const int * dates,
-    int32_t num_cashflows,
-    double guess,
-    double * out_result) noexcept;
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsXIRRCode finfuns_xirr(
+    FinFunsDayCount day_count, const double * cashflows, const int * dates, int num_cashflows, double guess, double * out_result) noexcept;
 
 
 #ifdef __cplusplus
