@@ -23,6 +23,7 @@ enum class XIRRErrorCode : int32_t
     NotEnoughCashflows, //!< At least two cashflows are required
     SameSignCashflows, //!< All cashflows have the same sign (all positive or all negative)
     CashflowsDatesSizeMismatch, //!< cashflows size does not match dates size
+    UnsupportedDayCountConvention, //!< unsupported day count convention
 };
 
 using XIRRError = std::variant<XIRRErrorCode, SolverErrorCode>;
@@ -37,6 +38,8 @@ inline constexpr std::string_view error_to_sv(XIRRErrorCode error)
             return "All cashflows have the same sign (all positive or all negative)";
         case XIRRErrorCode::CashflowsDatesSizeMismatch:
             return "Cashflows and dates arrays must have the same size";
+        case XIRRErrorCode::UnsupportedDayCountConvention:
+            return "Unsupported day count convention";
         default:
             return "Unknown XIRR error";
     }

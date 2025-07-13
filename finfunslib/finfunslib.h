@@ -24,6 +24,9 @@ FINFUNSLIB_EXPORT double finfuns_fv_due_begin(double rate, uint32_t periods, dou
 
 /**
  * @brief Error codes for IRR calculation
+ *
+ * @note Codes <100 indicate input validation errors,
+ *       >=100 indicate numerical convergence failures
  */
 typedef enum
 {
@@ -118,7 +121,7 @@ typedef enum
  * @param cashflows Array of cash flows
  * @param dates Array of Unix timestamps (seconds since epoch)
  * @param num_dates Length of cashflows / dates array
- * @param[out] out_result Calculated XNPV (valid only if return code is OK)
+ * @param[out] out_result Calculated XNPV (valid only if return code is SUCCESS)
  *
  * @return FinFunsXNPVError error code
  *
@@ -131,6 +134,50 @@ FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
     const int * dates,
     int32_t num_cashflows,
     double * out_result) noexcept;
+
+/**
+ * @brief Error codes for XIRR calculations
+ *
+ * @note Codes <100 indicate input validation errors,
+ *       >=100 indicate numerical convergence failures
+ */
+typedef enum
+{
+    FINFUNS_XIRR_SUCCESS = 0, ///< Calculation successful
+    FINFUNS_XIRR_NOT_ENOUGH_CASHFLOWS, ///< Requires at least 2 cashflows
+    FINFUNS_XIRR_SAME_SIGN_CASHFLOWS, ///< All cashflows positive/negative
+    FINFUNS_XIRR_SIZE_MISMATCH, ///< cashflows/dates count mismatch
+    FINFUNS_XIRR_UNSUPPORTED_DAYCOUNT, ///< Invalid day count convention
+    FINFUNS_XIRR_CANNOT_EVALUATE_VALUE = 100, ///< Numerical instability during evaluation
+    FINFUNS_XIRR_CANNOT_CONVERGE_ROUNDING, ///< Failed due to floating-point rounding errors
+    FINFUNS_XIRR_CANNOT_CONVERGE_ARGUMENTS, ///< Invalid mathematical arguments
+    FINFUNS_XIRR_NO_ROOT_IN_BRACKET, ///< No solution exists in search interval
+    FINFUNS_XIRR_OTHER_ERROR ///< Unspecified error condition
+} FinFunsXIRRCode;
+
+/**
+ * @brief Calculates XIRR with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
+ *
+ * @param day_count Day count convention (see FinFunsXIRRDayCount)
+ * @param cashflows Array of cash flows (must contain both positive/negative values)
+ * @param dates Array of Unix timestamps (seconds since epoch)
+ * @param num_cashflows Length of cashflows array (must be >= 2)
+ * @param guess Initial guess for the rate (suggested: 0.1 for 10%)
+ * @param[out] out_result Calculated XIRR (valid only if return code is SUCCESS)
+ *
+ * @return FinFunsXIRRCode error code
+ *
+ * @note Uses modified Newton-Raphson with fallback to bracketing when needed
+ * @warning First cashflow should typically be negative (initial investment)
+ */
+FINFUNSLIB_EXPORT FinFunsXIRRCode finfuns_xirr(
+    FinFunsDayCount day_count,
+    const double * cashflows,
+    const int * dates,
+    int32_t num_cashflows,
+    double guess,
+    double * out_result) noexcept;
+
 
 #ifdef __cplusplus
 }

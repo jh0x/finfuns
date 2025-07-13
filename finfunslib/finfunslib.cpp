@@ -101,6 +101,43 @@ FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
     return static_cast<FinFunsXNPVCode>(std::to_underlying((error)) + 1);
 }
 
+FINFUNSLIB_EXPORT FinFunsXIRRCode finfuns_xirr(
+    FinFunsDayCount day_count,
+    const double * cashflows,
+    const int * dates,
+    int32_t num_cashflows,
+    double guess,
+    double * out_result) noexcept
+{
+    const auto cf_span = std::span(cashflows, num_cashflows);
+    const auto date_span = std::span(dates, num_cashflows);
+    auto result = [&]() -> std::expected<double, XIRRError>
+    {
+        switch (day_count)
+        {
+            case FinFunsDayCount::FINFUNS_ACT_365F:
+                return xirr<DayCountConvention::ACT_365F>(cf_span, date_span, guess);
+            case FinFunsDayCount::FINFUNS_ACT_365_25:
+                return xirr<DayCountConvention::ACT_365_25>(cf_span, date_span, guess);
+            default:
+                return std::unexpected(XIRRErrorCode::UnsupportedDayCountConvention);
+        }
+    }();
+    if (result.has_value()) [[likely]]
+    {
+        *out_result = result.value();
+        return FINFUNS_XIRR_SUCCESS;
+    }
+    auto error = result.error();
+    auto error_code = std::visit(
+        overloaded{
+            [](XIRRErrorCode e) { return static_cast<FinFunsXIRRCode>(std::to_underlying(e) + 1); },
+            [](SolverErrorCode e) { return static_cast<FinFunsXIRRCode>(std::to_underlying(e) + 100); } // Offset for solver errors
+        },
+        error);
+    return error_code;
+}
+
 #ifdef __cplusplus
 }
 #endif
