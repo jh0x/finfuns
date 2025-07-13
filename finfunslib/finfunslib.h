@@ -12,7 +12,9 @@
 
 #include <cstdint>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
 FINFUNSLIB_EXPORT double finfuns_pv_due_end(double rate, uint32_t periods, double pmt, double future_value) noexcept;
 FINFUNSLIB_EXPORT double finfuns_pv_due_begin(double rate, uint32_t periods, double pmt, double future_value) noexcept;
@@ -85,4 +87,51 @@ typedef enum
  *       For OneBased mode, all cashflows are discounted (first occurs at t=1).
  */
 FinFunsNPVCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept;
+
+
+/**
+ * @brief Day count conventions
+ */
+typedef enum
+{
+    FINFUNS_ACT_365F, ///< Actual days / 365-day year (ISDA)
+    FINFUNS_ACT_365_25, ///< Actual days / 365.25-day year (ISDA)
+} FinFunsDayCount;
+
+/**
+ * @brief Error codes for XNPV calculations
+ */
+typedef enum
+{
+    FINFUNS_XNPV_SUCCESS = 0, ///< Calculation successful
+    FINFUNS_XNPV_INVALID_RATE, ///< Rate is NaN or infinite
+    FINFUNS_XNPV_EMPTY_CASHFLOWS, ///< cashflows == NULL or size == 0
+    FINFUNS_XNPV_SIZE_MISMATCH, ///< cashflows/dates size mismatch
+    FINFUNS_XNPV_UNSUPPORTED_DAY_COUNT, ///< Unsupported day count convention
+} FinFunsXNPVCode;
+
+/**
+ * @brief Calculates XNPV with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
+ *
+ * @param day_count Day count convention (see FinFunsDayCount)
+ * @param rate Discount rate (must be >= -1.0 and finite)
+ * @param cashflows Array of cash flows
+ * @param dates Array of Unix timestamps (seconds since epoch)
+ * @param num_dates Length of cashflows / dates array
+ * @param[out] out_result Calculated XNPV (valid only if return code is OK)
+ *
+ * @return FinFunsXNPVError error code
+ *
+ * @warning First cashflow (typically the investment) should be negative
+ */
+FINFUNSLIB_EXPORT FinFunsXNPVCode finfuns_xnpv(
+    FinFunsDayCount day_count,
+    double rate,
+    const double * cashflows,
+    const int * dates,
+    int32_t num_cashflows,
+    double * out_result) noexcept;
+
+#ifdef __cplusplus
 }
+#endif

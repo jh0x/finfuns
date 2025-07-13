@@ -23,6 +23,7 @@ enum class XNPVError : int32_t
     InvalidRate, //!< rate is NaN/infinity
     EmptyCashflows, //!< cashflows.empty()
     CashflowsDatesSizeMismatch, //!< cashflows size does not match dates size
+    UnsupportedDayCountConvention, //!< unsupported day count convention
 };
 
 inline constexpr std::string_view error_to_sv(XNPVError error)
@@ -35,6 +36,8 @@ inline constexpr std::string_view error_to_sv(XNPVError error)
             return "Cashflows array is empty";
         case XNPVError::CashflowsDatesSizeMismatch:
             return "Cashflows and dates arrays must have the same size";
+        case XNPVError::UnsupportedDayCountConvention:
+            return "Unsupported day count convention";
         default:
             return "Unknown XNPV error";
     }
