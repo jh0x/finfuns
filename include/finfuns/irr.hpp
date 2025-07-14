@@ -44,7 +44,7 @@ inline constexpr std::string_view error_to_sv(const IRRError & error)
     return std::visit([](const auto & e) { return error_to_sv(e); }, error);
 }
 
-std::expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
+inline std::expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
 {
     if (cashflows.size() <= 1) [[unlikely]]
         return std::unexpected(IRRErrorCode::NotEnoughCashflows);
