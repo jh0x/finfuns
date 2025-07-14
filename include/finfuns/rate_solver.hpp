@@ -46,6 +46,29 @@ inline constexpr std::string_view error_to_sv(SolverErrorCode error)
 }
 
 template <typename Calculator>
+struct CachedFunction
+{
+    Calculator & _calculator;
+    double _last_rate = std::numeric_limits<double>::quiet_NaN();
+    std::pair<double, double> _last_result;
+
+    CachedFunction(Calculator & c)
+        : _calculator{c}
+    {
+    }
+
+    std::pair<double, double> operator()(double rate)
+    {
+        if (rate != _last_rate)
+        {
+            _last_result = _calculator.calculate_with_derivative(rate);
+            _last_rate = rate;
+        }
+        return _last_result;
+    }
+};
+
+template <typename Calculator>
 std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, double guess)
 {
     constexpr int max_iterations = 100;
@@ -59,14 +82,9 @@ std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, dou
         // 53 - 4 bits of precision => ~14.75 decimal digits - accurate enough for our purpose
         constexpr auto binary_precision = std::numeric_limits<double>::digits - 4;
 
-        std::pair<double, double> f0_f1;
-        auto f0 = [&calculator, &f0_f1](double rate)
-        {
-            f0_f1 = calculator.calculate_with_derivative(rate);
-            return f0_f1.first;
-        };
-        auto f1 = [&calculator, &f0_f1](double rate) { return f0_f1.second; };
-        // newton_raphson_iterate evaluates f0 and f1 in order (but sadly the API doesn't allow us to pass something like FunWithDerivative directly)
+        auto cached_fun = CachedFunction(calculator);
+        auto f0 = [&cached_fun](double rate) { return cached_fun(rate).first; };
+        auto f1 = [&cached_fun](double rate) { return cached_fun(rate).second; };
 
         double result = boost::math::tools::newton_raphson_iterate(
             [&f0, &f1](double x) { return std::make_tuple(f0(x), f1(x)); },
