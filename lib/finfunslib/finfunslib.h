@@ -16,29 +16,104 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Calculates the present value (PV) of an annuity with end-of-period payments.
+ *
+ * Computes the present value of a series of equal payments (an annuity), optionally
+ * including a future lump sum, assuming payments are made at the end of each period.
+ *
+ * @param rate           The periodic interest rate (as a decimal, e.g., 0.05 for 5%).
+ * @param periods        The total number of payment periods.
+ * @param pmt            The payment amount made each period (outflow).
+ * @param future_value   A future value lump sum (inflow) received at the end of the last period.
+ *
+ * @return The present value of the annuity.
+ *
+ * @note Assumes end-of-period payments. For beginning-of-period (due), use a different function.
+ */
 FINFUNSLIB_EXPORT double finfuns_pv_due_end(double rate, uint32_t periods, double pmt, double future_value) noexcept;
+
+/**
+ * @brief Calculates the present value (PV) of an annuity with begin-of-period payments.
+ *
+ * Computes the present value of a series of equal payments (an annuity), optionally
+ * including a future lump sum, assuming payments are made at the beginning of each period.
+ *
+ * @param rate           The periodic interest rate (as a decimal, e.g., 0.05 for 5%).
+ * @param periods        The total number of payment periods.
+ * @param pmt            The payment amount made each period (outflow).
+ * @param future_value   A future value lump sum (inflow) received at the end of the last period.
+ *
+ * @return The present value of the annuity.
+ *
+ * @note Assumes begin-of-period payments. For end-of-period, use a different function.
+ */
 FINFUNSLIB_EXPORT double finfuns_pv_due_begin(double rate, uint32_t periods, double pmt, double future_value) noexcept;
 
+
+/**
+ * @brief Calculates the future value (FV) of an annuity with end-of-period payments.
+ *
+ * Computes the future value of a series of equal payments (an annuity), optionally
+ * including a present value lump sum, assuming payments are made at the end of each period.
+ *
+ * @param rate            The periodic interest rate (as a decimal, e.g., 0.05 for 5%).
+ * @param periods         The total number of payment periods.
+ * @param pmt             The payment amount made each period (outflow).
+ * @param present_value   The initial present value or lump sum (inflow) at period zero.
+ *
+ * @return The future value of the annuity at the end of the final period.
+ *
+ * @note Assumes end-of-period payments. For beginning-of-period (due), use a different function.
+ */
 FINFUNSLIB_EXPORT double finfuns_fv_due_end(double rate, uint32_t periods, double pmt, double present_value) noexcept;
+
+/**
+ * @brief Calculates the future value (FV) of an annuity with begin-of-period payments.
+ *
+ * Computes the future value of a series of equal payments (an annuity), optionally
+ * including a present value lump sum, assuming payments are made at the beginning of each period.
+ *
+ * @param rate            The periodic interest rate (as a decimal, e.g., 0.05 for 5%).
+ * @param periods         The total number of payment periods.
+ * @param pmt             The payment amount made each period (outflow).
+ * @param present_value   The initial present value or lump sum (inflow) at period zero.
+ *
+ * @return The future value of the annuity at the end of the final period.
+ *
+ * @note Assumes begin-of-period payments. For end-of-period, use a different function.
+ */
 FINFUNSLIB_EXPORT double finfuns_fv_due_begin(double rate, uint32_t periods, double pmt, double present_value) noexcept;
 
 /**
- * @brief Error codes for IRR calculation
+ * @brief Error codes for finfuns calculations
  *
  * @note Codes <100 indicate input validation errors,
  *       >=100 indicate numerical convergence failures
  */
 typedef enum
 {
-    FINFUNS_IRR_SUCCESS = 0, ///< Calculation succeeded
-    FINFUNS_IRR_NOT_ENOUGH_CASHFLOWS, ///< At least two cashflows are required
-    FINFUNS_IRR_SAME_SIGN_CASHFLOWS, ///< All cashflows have the same sign
-    FINFUNS_IRR_CANNOT_EVALUATE_VALUE = 100, ///< Numerical instability during evaluation
-    FINFUNS_IRR_CANNOT_CONVERGE_ROUNDING, ///< Failed due to floating-point rounding errors
-    FINFUNS_IRR_CANNOT_CONVERGE_ARGUMENTS, ///< Invalid mathematical arguments
-    FINFUNS_IRR_NO_ROOT_IN_BRACKET, ///< No solution exists in search interval
-    FINFUNS_IRR_OTHER_ERROR ///< Unspecified error condition
-} FinFunsIRRCode;
+    FINFUNS_CODE_SUCCESS = 0, ///< Operation completed successfully
+
+    // Common errors
+    FINFUNS_CODE_NOT_ENOUGH_CASHFLOWS, ///< At least two cashflows are required
+    FINFUNS_CODE_SAME_SIGN_CASHFLOWS, ///< All cashflows have the same sign
+    FINFUNS_CODE_INVALID_RATE, ///< Rate is NaN, infinite, or otherwise invalid
+    FINFUNS_CODE_EMPTY_CASHFLOWS, ///< No cashflows provided (nullptr or zero length)
+    FINFUNS_CODE_SIZE_MISMATCH, ///< Cashflows/dates size mismatch
+    FINFUNS_CODE_UNSUPPORTED_DAYCOUNT, ///< Unsupported or invalid day count convention
+
+    // Numerical errors
+    FINFUNS_CODE_CANNOT_EVALUATE_VALUE = 100, ///< Numerical instability during evaluation
+    FINFUNS_CODE_CANNOT_CONVERGE_ROUNDING, ///< Failed due to floating-point rounding errors
+    FINFUNS_CODE_CANNOT_CONVERGE_ARGUMENTS, ///< Invalid mathematical arguments
+    FINFUNS_CODE_NO_ROOT_IN_BRACKET, ///< No solution exists in search interval
+    FINFUNS_CODE_SOLVER_OTHER_ERROR, ///< Unspecified error condition
+
+    // Unexpected error
+    FINFUNS_CODE_UNEXPECTED_ERROR = 999,
+} FinFunsCode;
+
 
 /**
  * @brief Calculates Internal Rate of Return (IRR)
@@ -48,24 +123,14 @@ typedef enum
  * @param guess Initial guess for the IRR (recommended: 0.1 for 10%)
  * @param[out] out_result Calculated IRR (valid only when return code is IRR_SUCCESS)
  *
- * @return FinFunsIRRCode error code
+ * @return FinFunsCode error code
  *
  * @note The function uses Newton-Raphson iteration with fallback to bracketing methods.
  *
  * @warning The first cashflow should typically be negative (initial investment).
  */
-FINFUNSLIB_EXPORT [[nodiscard]] FinFunsIRRCode
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode
 finfuns_irr(const double * cashflows, int num_cashflows, double guess, double * out_result) noexcept;
-
-/**
- * @brief Error codes for NPV calculations
- */
-typedef enum
-{
-    FINFUNS_NPV_SUCCESS = 0, ///< Operation completed successfully
-    FINFUNS_NPV_INVALID_RATE, ///< Rate is NaN, infinite, or otherwise invalid
-    FINFUNS_NPV_EMPTY_CASHFLOWS ///< No cashflows provided (nullptr or zero length)
-} FinFunsNPVCode;
 
 /**
  * @brief Time period indexing convention
@@ -85,12 +150,12 @@ typedef enum
  * @param[in] num_cashflows Number of cash flows (must be > 0)
  * @param[out] out_result Calculated NPV (valid only if return code is FINFUNS_NPV_SUCCESS)
  *
- * @return FinFunsNPVCode error code
+ * @return FinFunsCode error code
  *
  * @note For ZeroBased mode, the first cashflow is considered to occur at time t=0.
  *       For OneBased mode, all cashflows are discounted (first occurs at t=1).
  */
-FINFUNSLIB_EXPORT [[nodiscard]] FinFunsNPVCode
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode
 finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept;
 
 
@@ -102,18 +167,6 @@ typedef enum
     FINFUNS_ACT_365F, ///< Actual days / 365-day year (ISDA)
     FINFUNS_ACT_365_25, ///< Actual days / 365.25-day year (ISDA)
 } FinFunsDayCount;
-
-/**
- * @brief Error codes for XNPV calculations
- */
-typedef enum
-{
-    FINFUNS_XNPV_SUCCESS = 0, ///< Calculation successful
-    FINFUNS_XNPV_INVALID_RATE, ///< Rate is NaN or infinite
-    FINFUNS_XNPV_EMPTY_CASHFLOWS, ///< cashflows == NULL or size == 0
-    FINFUNS_XNPV_SIZE_MISMATCH, ///< cashflows/dates size mismatch
-    FINFUNS_XNPV_UNSUPPORTED_DAY_COUNT, ///< Unsupported day count convention
-} FinFunsXNPVCode;
 
 /**
  * @brief Calculates XNPV with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
@@ -129,28 +182,8 @@ typedef enum
  *
  * @warning First cashflow (typically the investment) should be negative
  */
-FINFUNSLIB_EXPORT [[nodiscard]] FinFunsXNPVCode finfuns_xnpv(
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode finfuns_xnpv(
     FinFunsDayCount day_count, double rate, const double * cashflows, const int * dates, int num_cashflows, double * out_result) noexcept;
-
-/**
- * @brief Error codes for XIRR calculations
- *
- * @note Codes <100 indicate input validation errors,
- *       >=100 indicate numerical convergence failures
- */
-typedef enum
-{
-    FINFUNS_XIRR_SUCCESS = 0, ///< Calculation successful
-    FINFUNS_XIRR_NOT_ENOUGH_CASHFLOWS, ///< Requires at least 2 cashflows
-    FINFUNS_XIRR_SAME_SIGN_CASHFLOWS, ///< All cashflows positive/negative
-    FINFUNS_XIRR_SIZE_MISMATCH, ///< cashflows/dates count mismatch
-    FINFUNS_XIRR_UNSUPPORTED_DAYCOUNT, ///< Invalid day count convention
-    FINFUNS_XIRR_CANNOT_EVALUATE_VALUE = 100, ///< Numerical instability during evaluation
-    FINFUNS_XIRR_CANNOT_CONVERGE_ROUNDING, ///< Failed due to floating-point rounding errors
-    FINFUNS_XIRR_CANNOT_CONVERGE_ARGUMENTS, ///< Invalid mathematical arguments
-    FINFUNS_XIRR_NO_ROOT_IN_BRACKET, ///< No solution exists in search interval
-    FINFUNS_XIRR_OTHER_ERROR ///< Unspecified error condition
-} FinFunsXIRRCode;
 
 /**
  * @brief Calculates XIRR with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
@@ -162,12 +195,12 @@ typedef enum
  * @param guess Initial guess for the rate (suggested: 0.1 for 10%)
  * @param[out] out_result Calculated XIRR (valid only if return code is SUCCESS)
  *
- * @return FinFunsXIRRCode error code
+ * @return FinFunsCode error code
  *
  * @note Uses modified Newton-Raphson with fallback to bracketing when needed
  * @warning First cashflow should typically be negative (initial investment)
  */
-FINFUNSLIB_EXPORT [[nodiscard]] FinFunsXIRRCode finfuns_xirr(
+FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode finfuns_xirr(
     FinFunsDayCount day_count, const double * cashflows, const int * dates, int num_cashflows, double guess, double * out_result) noexcept;
 
 
