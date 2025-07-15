@@ -74,6 +74,29 @@ TEST_CASE("npv_lib")
     }
 }
 
+TEST_CASE("irr_lib")
+{
+    using namespace finfuns::test::irr;
+    for (const auto & test : irr_cases)
+    {
+        CAPTURE(test.id);
+        std::span<const double> cashflows = test.cashflows;
+        double value;
+        const auto rc = finfuns_irr(cashflows.data(), cashflows.size(), test.guess.value_or(0.1), &value);
+
+        if (test.expected_result.has_value())
+        {
+            REQUIRE(rc == FinFunsCode::FINFUNS_CODE_SUCCESS);
+            CHECK(value == doctest::Approx(test.expected_result.value()).epsilon(1e-6));
+        }
+        else
+        {
+            REQUIRE(rc != FinFunsCode::FINFUNS_CODE_SUCCESS);
+            // TODO: Check codes
+        }
+    }
+}
+
 TEST_CASE("xnpv_lib")
 {
     using namespace finfuns::test::xnpv;
