@@ -4,7 +4,9 @@ A collection of financial functions that I wrote while adding support for
 them to
 [ClickHouse (PR #81599)](https://github.com/ClickHouse/ClickHouse/pull/81599).
 
-Header only library is provided in `include/finfuns` (`finfuns::headers` in `CMakeLists`)
+Header only library (`finfuns::headers`) is provided in `include/finfuns` (`finfuns::headers` in `CMakeLists`)
+
+`finfuns::lib` is the compiled library component of finfuns, providing similar functionality - but behind a simple `C` style API. Internally it depends on `finfuns::headers`.
 
 Examples are provided in `examples`.
 
