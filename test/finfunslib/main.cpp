@@ -152,3 +152,57 @@ TEST_CASE("xnpv_lib")
         // TODO: Check codes
     }
 }
+
+TEST_CASE("xirr_lib")
+{
+    using namespace finfuns::test::xirr;
+    for (const auto & test : xirr_cases)
+    {
+        CAPTURE(test.id);
+        std::span<const double> cashflows = test.cashflows;
+        auto int_dates = IntDates::process(test.dates);
+        std::span<const int> dates = int_dates;
+        for (std::size_t i = 0; i != test.expected_results.size(); ++i)
+        {
+            CAPTURE(i);
+            const auto & ev = test.expected_results[i];
+            const auto day_count = ev.day_count;
+            const double expected_result = ev.value;
+            double value;
+            const auto rc = [&]
+            {
+                switch (day_count)
+                {
+                    case DayCountConvention::ACT_365F:
+                        return finfuns_xirr(
+                            FinFunsDayCount::FINFUNS_ACT_365F, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+                    case DayCountConvention::ACT_365_25:
+                        return finfuns_xirr(
+                            FinFunsDayCount::FINFUNS_ACT_365_25, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+                }
+                REQUIRE(false);
+                throw std::logic_error("Unexpected day count");
+            }();
+            REQUIRE(rc == FinFunsCode::FINFUNS_CODE_SUCCESS);
+            if (std::isinf(expected_result))
+                CHECK(std::isinf(value));
+            else
+                CHECK(value == doctest::Approx(expected_result).epsilon(1e-6));
+        }
+    }
+
+    for (const auto & test : error_cases)
+    {
+        if (test.expected_result == XIRRError{XIRRErrorCode::CashflowsDatesSizeMismatch})
+            continue; // We don't check this - the API requires cashflows + data ptr + one size right now
+        CAPTURE(test.id);
+        std::span<const double> cashflows = test.cashflows;
+        auto int_dates = IntDates::process(test.dates);
+        std::span<const int> dates = int_dates;
+        double value;
+        const auto rc = finfuns_xirr(FinFunsDayCount::FINFUNS_ACT_365F, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+
+        REQUIRE(rc != FinFunsCode::FINFUNS_CODE_SUCCESS);
+        // TODO: Check codes
+    }
+}
