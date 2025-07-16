@@ -14,7 +14,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ---- Dependencies ----
 
-find_package(Boost REQUIRED CONFIG COMPONENTS headers)
+#find_package(Boost REQUIRED CONFIG COMPONENTS headers)
+if(POLICY CMP0167)
+cmake_policy(SET CMP0167 OLD)
+endif()
+find_package(Boost 1.68.0 REQUIRED COMPONENTS headers)
+message(STATUS "Boost found: ${Boost_VERSION}")
+message(STATUS "Boost includes: ${Boost_INCLUDE_DIRS}")
 
 # ---- Declare header-only library ----
 
