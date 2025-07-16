@@ -14,9 +14,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ---- Dependencies ----
 
-find_package(Boost 1.68.0 REQUIRED COMPONENTS headers)
-message(STATUS "Boost found: ${Boost_VERSION}")
-message(STATUS "Boost includes: ${Boost_INCLUDE_DIRS}")
+find_package(Boost REQUIRED CONFIG COMPONENTS headers)
 
 # ---- Declare header-only library ----
 
@@ -69,9 +67,10 @@ set_target_properties(
 
 target_include_directories(
     finfunslib
+    SYSTEM
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>
+        "\$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/lib/>"
+        "\$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/export>"
 )
 
 target_link_libraries(finfunslib PRIVATE finfuns::headers)

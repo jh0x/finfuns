@@ -8,7 +8,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 
-#include "shared/finfunslib_export.hpp"
+#include "shared/finfunslib_export.h"
 
 #include <cstdint>
 
