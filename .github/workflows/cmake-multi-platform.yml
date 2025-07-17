@@ -1,0 +1,37 @@
+# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
+name: CI (CMake Presets)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+        - os: ubuntu-latest
+          preset: ci-ubuntu
+        - os: windows-latest
+          preset: ci-windows
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive  # If you have submodules
+
+    - name: Configure CMake
+      run: cmake --preset ${{ matrix.preset }}
+
+    - name: Build
+      run: cmake --build --preset ${{ matrix.preset }}
+    
+    - name: Test
+      run: ctest --preset ${{ matrix.preset }}
