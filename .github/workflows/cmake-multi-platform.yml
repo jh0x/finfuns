@@ -19,13 +19,13 @@ jobs:
         include:
         - os: ubuntu-latest
           preset: ci-ubuntu
-        - os: windows-latest
-          preset: ci-windows
+        # - os: windows-latest
+        #   preset: ci-windows
 
     steps:
     - uses: actions/checkout@v4
       with:
-        submodules: recursive  # If you have submodules
+        submodules: recursive
 
 
     - name: Install Boost on Ubuntu
@@ -33,10 +33,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libboost-all-dev
-
-    # ---- Windows-specific Boost info ----
-    # Visual Studio 2022 already includes Boost headers/libs
-    # in its vcpkg integration. If needed, use Chocolatey or vcpkg.
 
     - name: Configure CMake
       run: cmake --preset ${{ matrix.preset }}

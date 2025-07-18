@@ -162,5 +162,20 @@
       "description": "Local development with warnings and dev mode",
       "inherits": ["ci-build", "ci-win64", "clang-tidy", "flags-msvc", "dev-mode"]
     }
+  ],
+  "buildPresets": [
+  {
+    "name": "ci-ubuntu",
+    "configurePreset": "ci-ubuntu"
+  }
+  ],
+  "testPresets": [
+  {
+    "name": "ci-ubuntu",
+    "configurePreset": "ci-ubuntu",
+    "output": {
+      "outputOnFailure": true
+    }
+  }
   ]
 }
