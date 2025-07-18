@@ -7,10 +7,10 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <finfuns/expected.hpp>
 #include <finfuns/npv_calculator.hpp>
 #include <finfuns/rate_solver.hpp>
 
-#include <expected>
 #include <optional>
 #include <string_view>
 #include <variant>
@@ -44,10 +44,10 @@ constexpr std::string_view error_to_sv(const IRRError & error)
     return std::visit([](const auto & e) { return error_to_sv(e); }, error);
 }
 
-inline std::expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
+inline expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
 {
     if (cashflows.size() <= 1) [[unlikely]]
-        return std::unexpected(IRRErrorCode::NotEnoughCashflows);
+        return unexpected(IRRErrorCode::NotEnoughCashflows);
 
     bool has_positive = false;
     bool has_negative = false;
@@ -62,7 +62,7 @@ inline std::expected<double, IRRError> irr(std::span<const double> cashflows, st
             break;
     }
     if (not(has_negative && has_positive)) [[unlikely]]
-        return std::unexpected(IRRErrorCode::SameSignCashflows);
+        return unexpected(IRRErrorCode::SameSignCashflows);
 
     const double guess_value = guess.value_or(0.1);
     auto npv = NpvCalculator(cashflows);
@@ -70,7 +70,7 @@ inline std::expected<double, IRRError> irr(std::span<const double> cashflows, st
     auto res = rate_solver(std::move(npv), guess_value);
     if (res.has_value()) [[likely]]
         return res.value();
-    return std::unexpected(res.error());
+    return unexpected(res.error());
 }
 
 }

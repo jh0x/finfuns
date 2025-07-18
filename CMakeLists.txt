@@ -39,6 +39,13 @@ target_include_directories(
         "\$<INSTALL_INTERFACE:include>"
         "\$<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>"
 )
+target_include_directories(
+    finfuns
+    SYSTEM
+    INTERFACE
+        "\$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/extern/tl-expected/include>"
+        "\$<INSTALL_INTERFACE:extern/tl-expected/include>"
+)
 target_link_libraries(finfuns INTERFACE Boost::headers)
 
 # ---- Declare library ----

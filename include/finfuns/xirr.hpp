@@ -7,10 +7,10 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <finfuns/expected.hpp>
 #include <finfuns/rate_solver.hpp>
 #include <finfuns/xnpv_calculator.hpp>
 
-#include <expected>
 #include <optional>
 #include <string_view>
 #include <variant>
@@ -51,13 +51,13 @@ constexpr std::string_view error_to_sv(const XIRRError & error)
 }
 
 template <DayCountConvention day_count, typename DateType>
-std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::span<const DateType> dates, std::optional<double> guess)
+expected<double, XIRRError> xirr(std::span<const double> cashflows, std::span<const DateType> dates, std::optional<double> guess)
 {
     if (cashflows.size() <= 1) [[unlikely]]
-        return std::unexpected(XIRRErrorCode::NotEnoughCashflows);
+        return unexpected(XIRRErrorCode::NotEnoughCashflows);
 
     if (cashflows.size() != dates.size()) [[unlikely]]
-        return std::unexpected(XIRRErrorCode::CashflowsDatesSizeMismatch);
+        return unexpected(XIRRErrorCode::CashflowsDatesSizeMismatch);
 
     bool has_positive = false;
     bool has_negative = false;
@@ -72,7 +72,7 @@ std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::sp
             break;
     }
     if (not(has_negative && has_positive)) [[unlikely]]
-        return std::unexpected(XIRRErrorCode::SameSignCashflows);
+        return unexpected(XIRRErrorCode::SameSignCashflows);
 
     const double guess_value = guess.value_or(0.1);
     auto xnpv = XnpvCalculator<DateType, day_count>(cashflows, dates);
@@ -80,11 +80,11 @@ std::expected<double, XIRRError> xirr(std::span<const double> cashflows, std::sp
     auto res = rate_solver(std::move(xnpv), guess_value);
     if (res.has_value()) [[likely]]
         return res.value();
-    return std::unexpected(res.error());
+    return unexpected(res.error());
 }
 
 template <DayCountConvention day_count, typename DateContainer>
-std::expected<double, XIRRError> xirr(std::span<const double> cashflows, DateContainer && dates, std::optional<double> guess)
+expected<double, XIRRError> xirr(std::span<const double> cashflows, DateContainer && dates, std::optional<double> guess)
 {
     using ContainedType = std::remove_cvref_t<decltype(*std::begin(dates))>;
 

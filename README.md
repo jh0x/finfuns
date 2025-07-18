@@ -44,7 +44,7 @@ cmake --build build
 
 ```cpp
 template <IndexMode index_mode>
-std::expected<double, NPVError> npv(double rate, std::span<const double> cashflows)
+finfuns::expectedcted<double, NPVError> npv(double rate, std::span<const double> cashflows)
 ```
 
 Calculates the Net Present Value (NPV) of a series of cash flows assuming equal time intervals between each cash flow.
@@ -64,7 +64,7 @@ $$
 ### `irr` (Internal Rate of Return)
 
 ```cpp
-std::expected<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
+finfuns::expectedcted<double, IRRError> irr(std::span<const double> cashflows, std::optional<double> guess)
 ```
 
 Calculates the Internal Rate of Return (IRR) for a series of cash flows occurring at regular intervals. IRR is the discount rate at which the Net Present Value (NPV) equals zero.
@@ -79,7 +79,7 @@ $$
 
 ```cpp
 template <DayCountConvention day_count, typename DateContainer>
-std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, DateContainer && dates)
+finfuns::expectedcted<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, DateContainer && dates)
 
 // dates can be std::chrono::sys_days or int (e.g. days since epoch)
 ```
@@ -96,7 +96,7 @@ $$
 
 ```cpp
 template <DayCountConvention day_count, typename DateContainer>
-std::expected<double, XIRRError> xirr(std::span<const double> cashflows, DateContainer && dates, std::optional<double> guess)
+finfuns::expectedcted<double, XIRRError> xirr(std::span<const double> cashflows, DateContainer && dates, std::optional<double> guess)
 
 // dates can be std::chrono::sys_days or int (e.g. days since epoch)
 ```

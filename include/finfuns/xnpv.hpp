@@ -8,11 +8,11 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include <finfuns/day_count.hpp>
+#include <finfuns/expected.hpp>
 #include <finfuns/xnpv_calculator.hpp>
 
 #include <cmath>
 #include <cstdint>
-#include <expected>
 #include <string_view>
 
 namespace finfuns
@@ -44,20 +44,20 @@ constexpr std::string_view error_to_sv(XNPVError error)
 }
 
 template <DayCountConvention day_count, typename DateType>
-std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, std::span<const DateType> dates)
+expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, std::span<const DateType> dates)
 {
     if (std::isnan(rate) || std::isinf(rate)) [[unlikely]]
-        return std::unexpected(XNPVError::InvalidRate);
+        return unexpected(XNPVError::InvalidRate);
     if (cashflows.empty()) [[unlikely]]
-        return std::unexpected(XNPVError::EmptyCashflows);
+        return unexpected(XNPVError::EmptyCashflows);
     if (cashflows.size() != dates.size()) [[unlikely]]
-        return std::unexpected(XNPVError::CashflowsDatesSizeMismatch);
+        return unexpected(XNPVError::CashflowsDatesSizeMismatch);
     auto calc = XnpvCalculator<DateType, day_count>(cashflows, dates);
     return calc.calculate(rate);
 }
 
 template <DayCountConvention day_count, typename DateContainer>
-std::expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, DateContainer && dates)
+expected<double, XNPVError> xnpv(double rate, std::span<const double> cashflows, DateContainer && dates)
 {
     using ContainedType = std::remove_cvref_t<decltype(*std::begin(dates))>;
 

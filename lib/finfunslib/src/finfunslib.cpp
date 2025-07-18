@@ -7,6 +7,7 @@
 
 #include <finfunslib/finfunslib.h>
 
+#include <finfuns/expected.hpp>
 #include <finfuns/finfuns.hpp>
 #include <finfuns/overloaded.hpp>
 #include <finfuns/preprocessor.hpp>
@@ -156,7 +157,7 @@ FINFUNSLIB_EXPORT FinFunsCode finfuns_xnpv(
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);
-    auto result = [&]() -> std::expected<double, XNPVError>
+    auto result = [&]() -> expected<double, XNPVError>
     {
         switch (day_count)
         {
@@ -165,7 +166,7 @@ FINFUNSLIB_EXPORT FinFunsCode finfuns_xnpv(
             case FinFunsDayCount::FINFUNS_ACT_365_25:
                 return xnpv<DayCountConvention::ACT_365_25>(rate, cf_span, date_span);
             default:
-                [[unlikely]] return std::unexpected(XNPVError::UnsupportedDayCountConvention);
+                [[unlikely]] return unexpected(XNPVError::UnsupportedDayCountConvention);
         }
     }();
     if (result.has_value()) [[likely]]
@@ -187,7 +188,7 @@ FINFUNSLIB_EXPORT FinFunsCode finfuns_xirr(
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);
-    auto result = [&]() -> std::expected<double, XIRRError>
+    auto result = [&]() -> expected<double, XIRRError>
     {
         switch (day_count)
         {
@@ -196,7 +197,7 @@ FINFUNSLIB_EXPORT FinFunsCode finfuns_xirr(
             case FinFunsDayCount::FINFUNS_ACT_365_25:
                 return xirr<DayCountConvention::ACT_365_25>(cf_span, date_span, guess);
             default:
-                [[unlikely]] return std::unexpected(XIRRErrorCode::UnsupportedDayCountConvention);
+                [[unlikely]] return unexpected(XIRRErrorCode::UnsupportedDayCountConvention);
         }
     }();
     if (result.has_value()) [[likely]]

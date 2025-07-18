@@ -7,10 +7,11 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <finfuns/expected.hpp>
+
 #include <boost/math/tools/roots.hpp>
 
 #include <cmath>
-#include <expected>
 #include <limits>
 #include <string_view>
 #include <utility>
@@ -69,7 +70,7 @@ struct CachedFunction
 };
 
 template <typename Calculator>
-std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, double guess)
+expected<double, SolverErrorCode> rate_solver(Calculator && calculator, double guess)
 {
     constexpr int max_iterations = 100;
     constexpr double start_lower_bound = -0.999999; // Avoid the rate of -1.
@@ -103,7 +104,7 @@ std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, dou
         const double f_upper = fun(start_upper_bound);
 
         if (f_lower * f_upper >= 0.0) [[unlikely]]
-            return std::unexpected(SolverErrorCode::NO_ROOT_FOUND_IN_BRACKET);
+            return unexpected(SolverErrorCode::NO_ROOT_FOUND_IN_BRACKET);
 
         max_iter = max_iterations;
         boost::math::tools::eps_tolerance<double> tol(std::numeric_limits<double>::digits - 4);
@@ -113,19 +114,19 @@ std::expected<double, SolverErrorCode> rate_solver(Calculator && calculator, dou
     }
     catch (const boost::math::evaluation_error &)
     {
-        return std::unexpected(SolverErrorCode::CANNOT_EVALUATE_VALUE);
+        return unexpected(SolverErrorCode::CANNOT_EVALUATE_VALUE);
     }
     catch (const boost::math::rounding_error &)
     {
-        return std::unexpected(SolverErrorCode::CANNOT_CONVERGE_DUE_TO_ROUNDING_ERRORS);
+        return unexpected(SolverErrorCode::CANNOT_CONVERGE_DUE_TO_ROUNDING_ERRORS);
     }
     catch (const std::domain_error &)
     {
-        return std::unexpected(SolverErrorCode::CANNOT_CONVERGE_DUE_TO_INVALID_ARGUMENTS);
+        return unexpected(SolverErrorCode::CANNOT_CONVERGE_DUE_TO_INVALID_ARGUMENTS);
     }
     catch (...)
     {
-        return std::unexpected(SolverErrorCode::OTHER_ERROR);
+        return unexpected(SolverErrorCode::OTHER_ERROR);
     }
 }
 

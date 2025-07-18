@@ -7,12 +7,12 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+#include <finfuns/expected.hpp>
 #include <finfuns/finfuns.hpp>
 
 #include <chrono>
 #include <cmath>
 #include <cstdint>
-#include <expected>
 #include <limits>
 #include <vector>
 
@@ -129,16 +129,16 @@ struct TestData
     IndexMode mode;
     double rate;
     std::vector<double> cashflows;
-    std::expected<double, NPVError> expected_result;
+    finfuns::expected<double, NPVError> expected_result;
 };
 
 const std::vector<TestData> npv_cases
-    = {{1, IndexMode::ZeroBased, std::numeric_limits<double>::quiet_NaN(), {100.0}, std::unexpected(NPVError::InvalidRate)},
-       {2, IndexMode::OneBased, std::numeric_limits<double>::quiet_NaN(), {100.0}, std::unexpected(NPVError::InvalidRate)},
-       {3, IndexMode::ZeroBased, std::numeric_limits<double>::infinity(), {100.0}, std::unexpected(NPVError::InvalidRate)},
-       {4, IndexMode::OneBased, std::numeric_limits<double>::infinity(), {100.0}, std::unexpected(NPVError::InvalidRate)},
-       {5, IndexMode::ZeroBased, 0.08, {}, std::unexpected(NPVError::EmptyCashflows)},
-       {6, IndexMode::OneBased, 0.08, {}, std::unexpected(NPVError::EmptyCashflows)},
+    = {{1, IndexMode::ZeroBased, std::numeric_limits<double>::quiet_NaN(), {100.0}, finfuns::unexpected(NPVError::InvalidRate)},
+       {2, IndexMode::OneBased, std::numeric_limits<double>::quiet_NaN(), {100.0}, finfuns::unexpected(NPVError::InvalidRate)},
+       {3, IndexMode::ZeroBased, std::numeric_limits<double>::infinity(), {100.0}, finfuns::unexpected(NPVError::InvalidRate)},
+       {4, IndexMode::OneBased, std::numeric_limits<double>::infinity(), {100.0}, finfuns::unexpected(NPVError::InvalidRate)},
+       {5, IndexMode::ZeroBased, 0.08, {}, finfuns::unexpected(NPVError::EmptyCashflows)},
+       {6, IndexMode::OneBased, 0.08, {}, finfuns::unexpected(NPVError::EmptyCashflows)},
        {100, IndexMode::ZeroBased, 0.08, {100.0}, 100.0}, // NPV = 100.0 (t=0)
        {101, IndexMode::OneBased, 0.08, {100.0}, 100.0 / 1.08}, // NPV = 100.0 discounted (t=1)
        {200, IndexMode::ZeroBased, 0.1, {-10000.0, 3000.0, 4200.0, 6800.0}, 1307.287753568743},
@@ -158,7 +158,7 @@ struct TestData
     int id;
     std::vector<double> cashflows;
     std::optional<double> guess;
-    std::expected<double, IRRError> expected_result;
+    finfuns::expected<double, IRRError> expected_result;
 };
 
 const std::vector<TestData> irr_cases = {
@@ -171,10 +171,10 @@ const std::vector<TestData> irr_cases = {
     {106, {-100, 50, 50, 50, 50}, 1000.0, 0.3490344565611563},
     {107, {-70000, 12000, 15000, 18000, 21000, 26000}, 0.1, 0.0866309480365315},
 
-    {1001, {1000}, std::nullopt, std::unexpected(IRRErrorCode::NotEnoughCashflows)},
-    {1002, {100, 200, 300}, std::nullopt, std::unexpected(IRRErrorCode::SameSignCashflows)},
-    {1003, {-100, -200, -300}, 0.1, std::unexpected(IRRErrorCode::SameSignCashflows)},
-    {1004, {}, std::nullopt, std::unexpected(IRRErrorCode::NotEnoughCashflows)},
+    {1001, {1000}, std::nullopt, finfuns::unexpected(IRRErrorCode::NotEnoughCashflows)},
+    {1002, {100, 200, 300}, std::nullopt, finfuns::unexpected(IRRErrorCode::SameSignCashflows)},
+    {1003, {-100, -200, -300}, 0.1, finfuns::unexpected(IRRErrorCode::SameSignCashflows)},
+    {1004, {}, std::nullopt, finfuns::unexpected(IRRErrorCode::NotEnoughCashflows)},
 };
 }
 
