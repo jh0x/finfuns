@@ -53,7 +53,6 @@ TEST_CASE("npv_lib")
     for (const auto & test : npv_cases)
     {
         CAPTURE(test.id);
-        std::span<const double> cashflows = test.cashflows;
         double value;
         const auto rc = (test.mode == IndexMode::ZeroBased) ? finfuns_npv(
                                                                   FinFunsIndexMode::FINFUNS_ZERO_BASED,
