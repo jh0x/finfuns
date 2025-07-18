@@ -16,7 +16,7 @@
 
 #include <finfuns/irr.hpp>
 
-#include <format>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -30,11 +30,11 @@ int main()
     auto result = irr(cashflows, guess);
     if (result.has_value())
     {
-        std::println(std::cout, "The IRR is {:.2f}%", result.value() * 100);
+        std::cout << "The IRR is " << std::fixed << std::setprecision(2) << (result.value() * 100) << "%\n";
     }
     else
     {
-        std::println(std::cout, "IRR problem: {}", error_to_sv(result.error()));
+        std::cout << "IRR problem: " << error_to_sv(result.error()) << "\n";
     }
 
     return 0;

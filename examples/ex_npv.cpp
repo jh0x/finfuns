@@ -17,7 +17,7 @@
 
 #include <finfuns/npv.hpp>
 
-#include <format>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -32,22 +32,22 @@ int main()
         auto result_zero_based = npv<IndexMode::ZeroBased>(rate, cashflows);
         if (result_zero_based.has_value())
         {
-            std::println(std::cout, "The (zero-based) NPV is {:.2f}", result_zero_based.value());
+            std::cout << "The (zero-based) NPV is " << std::fixed << std::setprecision(2) << result_zero_based.value() << "\n";
         }
         else
         {
-            std::println(std::cout, "NPV problem: {}", error_to_sv(result_zero_based.error()));
+            std::cout << "NPV problem: " << error_to_sv(result_zero_based.error()) << "\n";
         }
     }
     {
         auto result_one_based = npv<IndexMode::OneBased>(rate, cashflows);
         if (result_one_based.has_value())
         {
-            std::println(std::cout, "The (one-based) NPV is {:.2f}", result_one_based.value());
+            std::cout << "The (one-based) NPV is " << std::fixed << std::setprecision(2) << result_one_based.value() << "\n";
         }
         else
         {
-            std::println(std::cout, "NPV problem: {}", error_to_sv(result_one_based.error()));
+            std::cout << "NPV problem: " << error_to_sv(result_one_based.error()) << "\n";
         }
     }
 

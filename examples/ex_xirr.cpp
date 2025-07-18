@@ -17,7 +17,7 @@
 #include <finfuns/xirr.hpp>
 
 #include <chrono>
-#include <format>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -35,11 +35,11 @@ int main()
     auto result = xirr<DayCountConvention::ACT_365F>(cashflows, dates, guess);
     if (result.has_value())
     {
-        std::println(std::cout, "The XIRR is {:.2f}%", result.value() * 100.);
+        std::cout << "The XIRR is " << std::fixed << std::setprecision(2) << (result.value() * 100.) << "%\n";
     }
     else
     {
-        std::println(std::cout, "XIRR problem: {}", error_to_sv(result.error()));
+        std::cout << "XIRR problem: " << error_to_sv(result.error()) << "\n";
     }
 
     return 0;

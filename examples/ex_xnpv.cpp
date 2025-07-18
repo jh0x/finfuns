@@ -17,7 +17,7 @@
 #include <finfuns/xnpv.hpp>
 
 #include <chrono>
-#include <format>
+#include <iomanip>
 #include <iostream>
 #include <vector>
 
@@ -35,12 +35,11 @@ int main()
     auto result = xnpv<DayCountConvention::ACT_365F>(rate, cashflows, dates);
     if (result.has_value())
     {
-        std::println(std::cout, "The XNPV is {:.2f}", result.value());
+        std::cout << "The XNPV is " << std::fixed << std::setprecision(2) << result.value() << "\n";
     }
     else
     {
-        std::println(std::cout, "XNPV problem: {}", error_to_sv(result.error()));
+        std::cout << "XNPV problem: " << error_to_sv(result.error()) << "\n";
     }
-
     return 0;
 }
