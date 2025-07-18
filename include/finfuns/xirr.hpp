@@ -28,7 +28,7 @@ enum class XIRRErrorCode : int32_t
 
 using XIRRError = std::variant<XIRRErrorCode, SolverErrorCode>;
 
-inline constexpr std::string_view error_to_sv(XIRRErrorCode error)
+constexpr std::string_view error_to_sv(XIRRErrorCode error)
 {
     switch (error)
     {
@@ -45,7 +45,7 @@ inline constexpr std::string_view error_to_sv(XIRRErrorCode error)
     }
 }
 
-inline constexpr std::string_view error_to_sv(const XIRRError & error)
+constexpr std::string_view error_to_sv(const XIRRError & error)
 {
     return std::visit([](const auto & e) { return error_to_sv(e); }, error);
 }

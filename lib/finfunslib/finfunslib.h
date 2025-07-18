@@ -85,6 +85,7 @@ FINFUNSLIB_EXPORT double finfuns_fv_due_end(double rate, uint32_t periods, doubl
  */
 FINFUNSLIB_EXPORT double finfuns_fv_due_begin(double rate, uint32_t periods, double pmt, double present_value) noexcept;
 
+// NOLINTBEGIN
 /**
  * @brief Error codes for finfuns calculations
  *
@@ -113,7 +114,7 @@ typedef enum
     // Unexpected error
     FINFUNS_CODE_UNEXPECTED_ERROR = 999,
 } FinFunsCode;
-
+// NOLINTEND
 
 /**
  * @brief Calculates Internal Rate of Return (IRR)
@@ -130,8 +131,9 @@ typedef enum
  * @warning The first cashflow should typically be negative (initial investment).
  */
 FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode
-finfuns_irr(const double * cashflows, int num_cashflows, double guess, double * out_result) noexcept;
+finfuns_irr(const double * cashflows, unsigned num_cashflows, double guess, double * out_result) noexcept;
 
+// NOLINTBEGIN
 /**
  * @brief Time period indexing convention
  */
@@ -140,6 +142,7 @@ typedef enum
     FINFUNS_ZERO_BASED, ///< First period is index 0 (standard financial convention)
     FINFUNS_ONE_BASED ///< First period is index 1 (alternative convention)
 } FinFunsIndexMode;
+// NOLINTEND
 
 /**
  * @brief Calculate Net Present Value (NPV)
@@ -156,9 +159,10 @@ typedef enum
  *       For OneBased mode, all cashflows are discounted (first occurs at t=1).
  */
 FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode
-finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept;
+finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, unsigned num_cashflows, double * out_result) noexcept;
 
 
+// NOLINTBEGIN
 /**
  * @brief Day count conventions
  */
@@ -167,6 +171,7 @@ typedef enum
     FINFUNS_ACT_365F, ///< Actual days / 365-day year (ISDA)
     FINFUNS_ACT_365_25, ///< Actual days / 365.25-day year (ISDA)
 } FinFunsDayCount;
+// NOLINTEND
 
 /**
  * @brief Calculates XNPV with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
@@ -183,7 +188,12 @@ typedef enum
  * @warning First cashflow (typically the investment) should be negative
  */
 FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode finfuns_xnpv(
-    FinFunsDayCount day_count, double rate, const double * cashflows, const int * dates, int num_cashflows, double * out_result) noexcept;
+    FinFunsDayCount day_count,
+    double rate,
+    const double * cashflows,
+    const int * dates,
+    unsigned num_cashflows,
+    double * out_result) noexcept;
 
 /**
  * @brief Calculates XIRR with dates as days since epoch (1970-01-01). Could also jus use relative days if the given date convention supports it.
@@ -201,7 +211,12 @@ FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode finfuns_xnpv(
  * @warning First cashflow should typically be negative (initial investment)
  */
 FINFUNSLIB_EXPORT [[nodiscard]] FinFunsCode finfuns_xirr(
-    FinFunsDayCount day_count, const double * cashflows, const int * dates, int num_cashflows, double guess, double * out_result) noexcept;
+    FinFunsDayCount day_count,
+    const double * cashflows,
+    const int * dates,
+    unsigned num_cashflows,
+    double guess,
+    double * out_result) noexcept;
 
 
 #ifdef __cplusplus

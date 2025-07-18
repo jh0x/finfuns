@@ -119,7 +119,7 @@ double finfuns_fv_due_begin(double rate, uint32_t periods, double pmt, double pr
     return fv<PaymentDueType::BeginningOfPeriod>(rate, periods, pmt, present_value);
 }
 
-FinFunsCode finfuns_irr(const double * cashflows, int num_cashflows, double guess, double * out_result) noexcept
+FinFunsCode finfuns_irr(const double * cashflows, unsigned num_cashflows, double guess, double * out_result) noexcept
 {
     const auto cf_span = std::span<const double>(cashflows, num_cashflows);
     auto result = irr(cf_span, guess);
@@ -133,7 +133,7 @@ FinFunsCode finfuns_irr(const double * cashflows, int num_cashflows, double gues
     return error_code;
 }
 
-FinFunsCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, int num_cashflows, double * out_result) noexcept
+FinFunsCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashflows, unsigned num_cashflows, double * out_result) noexcept
 {
     const auto cf_span = std::span{cashflows, static_cast<size_t>(num_cashflows)};
     auto result = (mode == FINFUNS_ZERO_BASED) ? npv<IndexMode::ZeroBased>(rate, cf_span) : npv<IndexMode::OneBased>(rate, cf_span);
@@ -147,7 +147,12 @@ FinFunsCode finfuns_npv(FinFunsIndexMode mode, double rate, const double * cashf
 }
 
 FINFUNSLIB_EXPORT FinFunsCode finfuns_xnpv(
-    FinFunsDayCount day_count, double rate, const double * cashflows, const int * dates, int num_cashflows, double * out_result) noexcept
+    FinFunsDayCount day_count,
+    double rate,
+    const double * cashflows,
+    const int * dates,
+    unsigned num_cashflows,
+    double * out_result) noexcept
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);
@@ -173,7 +178,12 @@ FINFUNSLIB_EXPORT FinFunsCode finfuns_xnpv(
 }
 
 FINFUNSLIB_EXPORT FinFunsCode finfuns_xirr(
-    FinFunsDayCount day_count, const double * cashflows, const int * dates, int num_cashflows, double guess, double * out_result) noexcept
+    FinFunsDayCount day_count,
+    const double * cashflows,
+    const int * dates,
+    unsigned num_cashflows,
+    double guess,
+    double * out_result) noexcept
 {
     const auto cf_span = std::span(cashflows, num_cashflows);
     const auto date_span = std::span(dates, num_cashflows);

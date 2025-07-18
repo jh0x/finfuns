@@ -1,4 +1,4 @@
-HeaderFilterRegex: '^.*/(include)/.*(h|hpp)$'
+HeaderFilterRegex: '^(?!.*extern/).*/(include|src|test)/.*'
 
 Checks: [
   '*',
@@ -125,7 +125,6 @@ CheckOptions:
   readability-identifier-naming.EnumCase: CamelCase
   readability-identifier-naming.LocalVariableCase: lower_case
   readability-identifier-naming.StaticConstantCase: aNy_CasE
-  readability-identifier-naming.MemberCase: lower_case
   readability-identifier-naming.PrivateMemberPrefix: ''
   readability-identifier-naming.ProtectedMemberPrefix: ''
   readability-identifier-naming.PublicMemberCase: lower_case
@@ -146,4 +145,3 @@ CheckOptions:
   cppcoreguidelines-avoid-do-while.IgnoreMacros: true
   readability-identifier-naming.MemberCase: lower_case
   readability-identifier-naming.MemberPrefix: '_'
-  

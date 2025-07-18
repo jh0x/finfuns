@@ -26,7 +26,7 @@ enum class IRRErrorCode : int32_t
 
 using IRRError = std::variant<IRRErrorCode, SolverErrorCode>;
 
-inline constexpr std::string_view error_to_sv(IRRErrorCode error)
+constexpr std::string_view error_to_sv(IRRErrorCode error)
 {
     switch (error)
     {
@@ -39,7 +39,7 @@ inline constexpr std::string_view error_to_sv(IRRErrorCode error)
     }
 }
 
-inline constexpr std::string_view error_to_sv(const IRRError & error)
+constexpr std::string_view error_to_sv(const IRRError & error)
 {
     return std::visit([](const auto & e) { return error_to_sv(e); }, error);
 }

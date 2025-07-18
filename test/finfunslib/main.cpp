@@ -5,6 +5,7 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks)
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
@@ -54,9 +55,18 @@ TEST_CASE("npv_lib")
         CAPTURE(test.id);
         std::span<const double> cashflows = test.cashflows;
         double value;
-        const auto rc = (test.mode == IndexMode::ZeroBased)
-            ? finfuns_npv(FinFunsIndexMode::FINFUNS_ZERO_BASED, test.rate, test.cashflows.data(), test.cashflows.size(), &value)
-            : finfuns_npv(FinFunsIndexMode::FINFUNS_ONE_BASED, test.rate, test.cashflows.data(), test.cashflows.size(), &value);
+        const auto rc = (test.mode == IndexMode::ZeroBased) ? finfuns_npv(
+                                                                  FinFunsIndexMode::FINFUNS_ZERO_BASED,
+                                                                  test.rate,
+                                                                  test.cashflows.data(),
+                                                                  static_cast<unsigned>(test.cashflows.size()),
+                                                                  &value)
+                                                            : finfuns_npv(
+                                                                  FinFunsIndexMode::FINFUNS_ONE_BASED,
+                                                                  test.rate,
+                                                                  test.cashflows.data(),
+                                                                  static_cast<unsigned>(test.cashflows.size()),
+                                                                  &value);
 
         if (test.expected_result.has_value())
         {
@@ -82,7 +92,7 @@ TEST_CASE("irr_lib")
         CAPTURE(test.id);
         std::span<const double> cashflows = test.cashflows;
         double value;
-        const auto rc = finfuns_irr(cashflows.data(), cashflows.size(), test.guess.value_or(0.1), &value);
+        const auto rc = finfuns_irr(cashflows.data(), static_cast<unsigned>(cashflows.size()), test.guess.value_or(0.1), &value);
 
         if (test.expected_result.has_value())
         {
@@ -120,10 +130,20 @@ TEST_CASE("xnpv_lib")
                 {
                     case DayCountConvention::ACT_365F:
                         return finfuns_xnpv(
-                            FinFunsDayCount::FINFUNS_ACT_365F, rate, cashflows.data(), dates.data(), cashflows.size(), &value);
+                            FinFunsDayCount::FINFUNS_ACT_365F,
+                            rate,
+                            cashflows.data(),
+                            dates.data(),
+                            static_cast<unsigned>(cashflows.size()),
+                            &value);
                     case DayCountConvention::ACT_365_25:
                         return finfuns_xnpv(
-                            FinFunsDayCount::FINFUNS_ACT_365_25, rate, cashflows.data(), dates.data(), cashflows.size(), &value);
+                            FinFunsDayCount::FINFUNS_ACT_365_25,
+                            rate,
+                            cashflows.data(),
+                            dates.data(),
+                            static_cast<unsigned>(cashflows.size()),
+                            &value);
                 }
                 REQUIRE(false);
                 throw std::logic_error("Unexpected day count");
@@ -146,7 +166,8 @@ TEST_CASE("xnpv_lib")
         std::span<const int> dates = int_dates;
         const auto rate = test.rate;
         double value;
-        const auto rc = finfuns_xnpv(FinFunsDayCount::FINFUNS_ACT_365F, rate, cashflows.data(), dates.data(), cashflows.size(), &value);
+        const auto rc = finfuns_xnpv(
+            FinFunsDayCount::FINFUNS_ACT_365F, rate, cashflows.data(), dates.data(), static_cast<unsigned>(cashflows.size()), &value);
 
         REQUIRE(rc != FinFunsCode::FINFUNS_CODE_SUCCESS);
         // TODO: Check codes
@@ -175,10 +196,20 @@ TEST_CASE("xirr_lib")
                 {
                     case DayCountConvention::ACT_365F:
                         return finfuns_xirr(
-                            FinFunsDayCount::FINFUNS_ACT_365F, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+                            FinFunsDayCount::FINFUNS_ACT_365F,
+                            cashflows.data(),
+                            dates.data(),
+                            static_cast<unsigned>(cashflows.size()),
+                            0.1,
+                            &value);
                     case DayCountConvention::ACT_365_25:
                         return finfuns_xirr(
-                            FinFunsDayCount::FINFUNS_ACT_365_25, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+                            FinFunsDayCount::FINFUNS_ACT_365_25,
+                            cashflows.data(),
+                            dates.data(),
+                            static_cast<unsigned>(cashflows.size()),
+                            0.1,
+                            &value);
                 }
                 REQUIRE(false);
                 throw std::logic_error("Unexpected day count");
@@ -200,9 +231,11 @@ TEST_CASE("xirr_lib")
         auto int_dates = IntDates::process(test.dates);
         std::span<const int> dates = int_dates;
         double value;
-        const auto rc = finfuns_xirr(FinFunsDayCount::FINFUNS_ACT_365F, cashflows.data(), dates.data(), cashflows.size(), 0.1, &value);
+        const auto rc = finfuns_xirr(
+            FinFunsDayCount::FINFUNS_ACT_365F, cashflows.data(), dates.data(), static_cast<unsigned>(cashflows.size()), 0.1, &value);
 
         REQUIRE(rc != FinFunsCode::FINFUNS_CODE_SUCCESS);
         // TODO: Check codes
     }
 }
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

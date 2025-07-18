@@ -26,7 +26,7 @@ enum class XNPVError : int32_t
     UnsupportedDayCountConvention, //!< unsupported day count convention
 };
 
-inline constexpr std::string_view error_to_sv(XNPVError error)
+constexpr std::string_view error_to_sv(XNPVError error)
 {
     switch (error)
     {

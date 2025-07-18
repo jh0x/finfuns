@@ -16,9 +16,9 @@
 #include <limits>
 #include <vector>
 
-using namespace std::chrono;
-using namespace std::chrono_literals;
-using namespace finfuns;
+using namespace std::chrono; // NOLINT(google-global-names-in-headers)
+using namespace std::chrono_literals; // NOLINT(google-global-names-in-headers)
+using namespace finfuns; // NOLINT(google-global-names-in-headers)
 
 namespace finfuns::test::pv
 {

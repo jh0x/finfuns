@@ -25,7 +25,7 @@ enum class DayCountConvention : int32_t
     ACT_365_25,
 };
 
-inline constexpr std::string_view day_count_to_string(DayCountConvention dcc)
+constexpr std::string_view day_count_to_string(DayCountConvention dcc)
 {
     switch (dcc)
     {
@@ -40,18 +40,18 @@ inline constexpr std::string_view day_count_to_string(DayCountConvention dcc)
 
 
 template <ChronoDayType D>
-inline constexpr auto days_between_act(D d1, D d2)
+constexpr auto days_between_act(D d1, D d2)
 {
     return (d2 - d1).count();
 }
 
-inline constexpr int days_between_act(int d1, int d2)
+constexpr int days_between_act(int d1, int d2)
 {
     return d2 - d1;
 }
 
 template <DayCountConvention dcc, typename D>
-inline constexpr double year_fraction(D d1, D d2)
+constexpr double year_fraction(D d1, D d2)
 {
     if constexpr (dcc == DayCountConvention::ACT_365F)
         return static_cast<double>(days_between_act(d1, d2)) / 365.0;

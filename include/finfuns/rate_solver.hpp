@@ -27,7 +27,7 @@ enum class SolverErrorCode
     OTHER_ERROR
 };
 
-inline constexpr std::string_view error_to_sv(SolverErrorCode error)
+constexpr std::string_view error_to_sv(SolverErrorCode error)
 {
     switch (error)
     {
@@ -52,7 +52,7 @@ struct CachedFunction
     double _last_rate = std::numeric_limits<double>::quiet_NaN();
     std::pair<double, double> _last_result;
 
-    CachedFunction(Calculator & c)
+    explicit CachedFunction(Calculator & c)
         : _calculator{c}
     {
     }

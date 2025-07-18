@@ -23,7 +23,7 @@ enum class NPVError : int32_t
     EmptyCashflows, //!< cashflows.empty()
 };
 
-inline constexpr std::string_view error_to_sv(NPVError error)
+constexpr std::string_view error_to_sv(NPVError error)
 {
     switch (error)
     {
