@@ -1,5 +1,3 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: CI (CMake Presets)
 
 on:
@@ -14,31 +12,50 @@ jobs:
 
     strategy:
       fail-fast: false
-
       matrix:
         include:
         - os: ubuntu-latest
           preset: ci-ubuntu
-        # - os: windows-latest
-        #   preset: ci-windows
+          compiler: gcc
+          cxx: g++
+          boost-packages: libboost-system-dev libboost-filesystem-dev
+        - os: ubuntu-latest
+          preset: ci-ubuntu
+          compiler: clang
+          cxx: clang++
+          boost-packages: libboost-system-dev libboost-filesystem-dev
 
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
 
+    - name: Cache Boost
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-boost-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-boost-
 
-    - name: Install Boost on Ubuntu
-      if: runner.os == 'Linux'
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libboost-all-dev
+        sudo apt-get install -y ${{ matrix.compiler }} ${{ matrix.boost-packages }} ccache
+
+    - name: Set up ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ matrix.compiler }}-${{ hashFiles('**/CMakeLists.txt') }}
 
     - name: Configure CMake
-      run: cmake --preset ${{ matrix.preset }}
+      run: |
+        ccache --show-stats
+        CC=${{ matrix.compiler }} CXX=${{ matrix.cxx }} cmake --preset ${{ matrix.preset }} -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
     - name: Build
-      run: cmake --build --preset ${{ matrix.preset }}
+      run: cmake --build --preset ${{ matrix.preset }} --parallel
 
     - name: Test
       run: ctest --preset ${{ matrix.preset }}
